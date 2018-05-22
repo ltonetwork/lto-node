@@ -1,0 +1,40 @@
+version: '3'
+# do not forget the version line, this file syntax is invalid without it
+
+services:
+    lto-webserver:
+      container_name: webserver
+      image: legalthings/webserver
+      ports:
+        - "3000:3000"
+      networks:
+        - lto
+
+    legalflow:
+      container_name: legalflow
+      image: legalthings/legalflow
+      environment:
+       - APPLICATION_ENV=dev.docker
+      networks:
+        - lto
+      depends_on:
+       - mongo
+
+    legalevents:
+      container_name: legalevents
+      image: legalthings/legalevents
+      environment:
+       - APPLICATION_ENV=dev.docker
+      networks:
+        - lto
+      depends_on:
+       - mongo
+
+    mongo:
+      image: "mongo:3"
+      networks:
+        - lto
+
+networks:
+  lto:
+    driver: bridge
