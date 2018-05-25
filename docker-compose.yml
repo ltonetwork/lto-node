@@ -14,7 +14,7 @@ services:
       container_name: legalflow
       image: legalthings/legalflow
       environment:
-       - APPLICATION_ENV=dev.docker
+       - APPLICATION_ENV=lto
       networks:
         - lto
       depends_on:
@@ -24,7 +24,7 @@ services:
       container_name: legalevents
       image: legalthings/legalevents
       environment:
-       - APPLICATION_ENV=dev.docker
+       - APPLICATION_ENV=lto
       networks:
         - lto
       depends_on:

@@ -1,0 +1,33 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "webserver",
+      "image": "legalthings/webserver",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 3000
+        }
+      ],
+      "links": [
+        "legalevents",
+        "legalflow"
+      ]
+    },
+    {
+      "name": "legalflow",
+      "image": "legalthings/legalflow",
+      "essential": true,
+      "memory": 128
+    },
+    {
+      "name": "legalevents",
+      "image": "legalthings/legalevents",
+      "essential": true,
+      "memory": 128
+    }
+  ]
+}
