@@ -1,0 +1,40 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "lto-data",
+      "host": {
+        "sourcePath": "/lto/data"
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "webserver",
+      "image": "legalthings/anchor",
+      "essential": true,
+      "memory": 192,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 3000
+        }
+      ],
+      "links": [
+        "public-node"
+      ]
+    },
+    {
+      "name": "public-node",
+      "image": "legalthings/public-node",
+      "essential": true,
+      "memory": 1792,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-data",
+          "containerPath": "/lto/data"
+        }
+      ]
+    }
+  ]
+}
