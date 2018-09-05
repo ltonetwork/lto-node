@@ -27,7 +27,7 @@ port you will need to change the `docker-compose.yml` to
 
 ```
 ports:
-    - <your-port>:3000
+    - <your-port>:80
 ```
 
 This way the node will be accessible via port 80.

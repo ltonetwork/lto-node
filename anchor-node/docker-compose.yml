@@ -1,5 +1,4 @@
 version: '3'
-# do not forget the version line, this file syntax is invalid without it
 
 services:
   redis:
@@ -13,7 +12,7 @@ services:
     environment:
       - LTO_API_KEY=<a secret to use the api>
     ports:
-      - 80:3000
+      - 80:80
     networks:
       - lto
     depends_on:

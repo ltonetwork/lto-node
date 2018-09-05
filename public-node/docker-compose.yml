@@ -1,5 +1,4 @@
 version: '3'
-# do not forget the version line, this file syntax is invalid without it
 
 services:
 
