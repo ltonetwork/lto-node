@@ -41,7 +41,7 @@ Take to following steps to install the node on EB:
 2. Create an application
 3. Inside the created application, create an environment: `webserver environment`
 4. Select following settings:
-  - Platform: Multi-container Docker
+  - Platform: Docker
   - Upload the zipped file
 5. Configure more options
 6. Instances -> Instance type: Choose an instance with atleast 2 gb of memory (E.g. t2.small)

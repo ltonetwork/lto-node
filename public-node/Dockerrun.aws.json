@@ -1,31 +1,17 @@
 {
-  "AWSEBDockerrunVersion": 2,
-  "volumes": [
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "legalthings/public-node"
+  },
+  "Ports": [
     {
-      "name": "lto-data",
-      "host": {
-        "sourcePath": "/lto/data"
-      }
+      "ContainerPort": "6869"
     }
   ],
-  "containerDefinitions": [
+  "Volumes": [
     {
-      "name": "public-node",
-      "image": "legalthings/public-node",
-      "essential": true,
-      "memory": 1984,
-      "portMappings": [
-        {
-          "hostPort": 80,
-          "containerPort": 6869
-        }
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "lto-data",
-          "containerPath": "/lto/data"
-        }
-      ]
+      "HostDirectory": "/lto/data",
+      "ContainerDirectory": "/lto/data"
     }
   ]
 }
