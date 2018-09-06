@@ -39,7 +39,7 @@ There are different required fields, they are mentioned per service:
 - `LTO_API_KEY`: This is used to connect to the `Public Node`. (Random secret)
 
 *Public Node*
--  `LTO_API_KEY`: This is to set an api key to protect restricted api functions. (Random secret)
+- `LTO_API_KEY`: This is to set an api key to protect restricted api functions. (Random secret)
 - `LTO_WALLET_SEED`: This is the seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions.
 
 or
@@ -48,9 +48,26 @@ or
 
 ##### Optional fields
 
-The optional fields will also be discussed per service:
+There a several settings that you can change within the node.
 
-*Webserver*
+*Database*
+
+The Node uses `Mongo` en `Redis` database systems. If you already have a Mongo or Redis solution it's possible to connect 
+the node to your existing solutions. 
+
+**Mongo**
+
+If you wish to use your existing mongo solution you need to add the following environment variable:
+
+`MONGO_DB=<mongo connection string>` to the following services: `legalflow` and `legalevents`.
+
+**Redis** 
+
+If you whish to use you existing redis solution you need to add the following environment variable:
+
+`ANCHOR_DB_URL=<redis connection string>` to the following service `anchor`. 
+
+*Port*
 
 Docker compose is configured to run the node on a local machine on port 80. If you would like to run the node on different
 port you will need to change the `docker-compose.yml` to

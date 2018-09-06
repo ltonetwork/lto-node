@@ -51,7 +51,7 @@ services:
       image: legalthings/legalflow:v0.1.0
       environment:
        - APPLICATION_ENV=lto
-       - phpmemory_limit=256M
+       - phpmemory_limit=512M
       networks:
         - lto
       depends_on:
@@ -62,7 +62,7 @@ services:
       image: legalthings/legalevents:v0.1.0
       environment:
       - APPLICATION_ENV=lto
-      - phpmemory_limit=256M
+      - phpmemory_limit=512M
       networks:
       - lto
       depends_on:
