@@ -13,7 +13,7 @@
       "name": "webserver",
       "image": "legalthings/anchor",
       "essential": true,
-      "memory": 192,
+      "memoryReservation": 128,
       "portMappings": [
         {
           "hostPort": 80,
@@ -28,7 +28,7 @@
       "name": "public-node",
       "image": "legalthings/public-node",
       "essential": true,
-      "memory": 1792,
+      "memoryReservation": 1024,
       "mountPoints": [
         {
           "sourceVolume": "lto-data",
