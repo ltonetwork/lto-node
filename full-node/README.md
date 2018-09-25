@@ -1,16 +1,13 @@
-LegalThings Full One Node
-===
+#LTO Network Full Node
 
-Requirements
----
+##Requirements
 
 - [Docker](https://www.docker.com/)
 - [Docker compose >= v3.0](https://docs.docker.com/compose/)
 
 _You can optain the latest version of `docker-compose` using pip._
 
-Run on a (virtual) machine
----
+##Run on a (virtual) machine
 
 ### System requirements
 
@@ -73,7 +70,7 @@ Docker compose is configured to run the node on a local machine on port 80. If y
 port you will need to change the `docker-compose.yml` to
 
     ports:
-        - "<your-port>:3000"
+        - "<your-port>:80"
 
 This way the node will be accessible via port 80.
 

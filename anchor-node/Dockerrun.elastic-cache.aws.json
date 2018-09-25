@@ -10,7 +10,7 @@
   ],
   "containerDefinitions": [
     {
-      "name": "webserver",
+      "name": "anchor",
       "image": "legalthings/anchor",
       "essential": true,
       "memoryReservation": 128,
