@@ -1,6 +1,6 @@
-#LTO Network Anchor Node
+# LTO Network Anchor Node
 
-##Configuration
+## Configuration
 
 Before you run the node you will need to configure a few environment variables per service:
 
@@ -13,7 +13,7 @@ Before you run the node you will need to configure a few environment variables p
 **Anchor service**
 1. LTO_API_KEY: The same ApiKey as was set in the `Public Node`. 
 
-##Run on a (virtual) machine
+## Run on a (virtual) machine
 
 
 ```
@@ -32,7 +32,7 @@ This way the node will be accessible via port 80.
 
 Or you can use a reverse proxy like NGINX to make the node publicly available. This is highly recommended. 
 
-##Run in AWS Elastic Beanstalk
+## Run in AWS Elastic Beanstalk
 Running the node using AWS Elastic Beanstalk (EB) it will only install the services on a machine. This node includes a
 Redis database, however it is highly recommended to use AWS Elastic Cache. The are 2 EB configuration files included. 
 

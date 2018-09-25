@@ -1,13 +1,13 @@
-#LTO Network Full Node
+# LTO Network Full Node
 
-##Requirements
+## Requirements
 
 - [Docker](https://www.docker.com/)
 - [Docker compose >= v3.0](https://docs.docker.com/compose/)
 
 _You can optain the latest version of `docker-compose` using pip._
 
-##Run on a (virtual) machine
+## Run on a (virtual) machine
 
 ### System requirements
 

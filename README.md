@@ -1,7 +1,7 @@
 # LTO Network Node
 
 
-##Requirements
+## Requirements
 
 - [Docker](https://www.docker.com/)
 - [Docker compose >= v3.0](https://docs.docker.com/compose/)
@@ -9,7 +9,7 @@
 _You can optain the latest version of `docker-compose` using pip._
 
 
-##Installation
+## Installation
 
 This repository contains the configuration files to run your LTO Node. There are 3 configuration variations of the node.
 Each configuration serves a different need of the node:
