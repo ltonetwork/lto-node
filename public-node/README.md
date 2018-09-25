@@ -1,8 +1,6 @@
-LegalThings One Public Node
-===
+#LegalThings One Public Node
 
-Configuration
--------------
+##Configuration
 
 Before you run the node you will need to configure a few environment variables per service:
 
@@ -13,8 +11,7 @@ Before you run the node you will need to configure a few environment variables p
 4. LTO_API_KEY: Choose an api-key to be able to perform certain actions in the GUI.
 
 
-Run on a (virtual) machine
----
+##Run on a (virtual) machine
 
 ```
 docker-compose up
@@ -32,8 +29,7 @@ This way the node will be accessible via port 80.
 
 Or you can use a reverse proxy like NGINX to make the node publicly available. This is highly recommended. 
 
-Run in AWS Elastic Beanstalk
----
+##Run in AWS Elastic Beanstalk
 
 Take to following steps to install the node on EB:
 
@@ -50,3 +46,11 @@ Take to following steps to install the node on EB:
     - Name: `LTO_WALLET_SEED` or `LTO_WALLET_SEED_BASE58`, Value: `Wallet Seed`
 
 Now your node is should good to go!
+
+## Documentation
+
+You can find the API documentation on the url where your node is deployed.
+
+## Explorer
+
+View your transactions in our explorer testnet: [testnet-explorer.lto.network](https://testnet-explorer.lto.network)
