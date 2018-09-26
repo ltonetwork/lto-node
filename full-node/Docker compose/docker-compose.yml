@@ -42,13 +42,13 @@ services:
       environment:
        - LOG_LEVEL=debug
       ports:
-        - "3000:3000"
+        - "3000:80"
       networks:
         - lto
 
     legalflow:
       container_name: legalflow
-      image: legalthings/legalflow:v0.1.0
+      image: legalthings/legalflow
       environment:
        - APPLICATION_ENV=lto
        - phpmemory_limit=512M
@@ -59,7 +59,7 @@ services:
 
     legalevents:
       container_name: legalevents
-      image: legalthings/legalevents:v0.1.0
+      image: legalthings/legalevents
       environment:
       - APPLICATION_ENV=lto
       - phpmemory_limit=512M
@@ -68,8 +68,8 @@ services:
       depends_on:
       - mongo
 
-    event-dispatcher:
-      container_name: event-dispatcher
+    event-queuer:
+      container_name: event-queuer
       image: legalthings/event-dispatcher
       environment:
       - NODE_ENV=lto

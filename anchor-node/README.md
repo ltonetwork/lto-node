@@ -53,7 +53,7 @@ Take to following steps to install the node on EB:
 6. Software -> Environment properties:
     - Name: `LTO_WALLET_PASSWORD`, Value: `Your wallet password`
     - Name: `LTO_WALLET_SEED` or `LTO_WALLET_SEED_BASE58`, Value: `Wallet Seed`
-    - Name: `ANCHOR_DB_URL`, Value: `"<Your redis connection string>"` (If you are running with elastic cache)
+    - Name: `ANCHOR_REDIS_URL`, Value: `"<Your redis connection string>"` (If you are running with elastic cache)
 
 Now your node is should good to go!
 
