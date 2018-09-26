@@ -48,12 +48,12 @@ or
 The node configuration comes with Redis, RabbitMQ and MongoDB included. It is adviced to run these services outside of 
 the node. The following Environment properties can be used to connect to external services:
 
-| Service                   | Variable                    | Description                           |
-| ------------------------- | ----------------------------| ------------------------------------- |
-| LegelEvents / Legalflow   | MONGODB_URL                 | Use the MongoDB connection string     |
-| Anchor                    | ANCHOR_REDIS_URL            | Use the redis connection string       |
-| Event Dispatcher          | DISPATCHER_RABBITMQ_CLIENT  | Use the RabbitMQ connection string    | 
-| Webserver                 | PORT                        | Run the node on a different port      |  
+Service                   | Variable                    | Description                           
+------------------------- | ----------------------------| ------------------------------------- 
+LegelEvents / Legalflow   | MONGODB_URL                 | Use the MongoDB connection string     
+Anchor                    | ANCHOR_REDIS_URL            | Use the redis connection string       
+Event Dispatcher          | DISPATCHER_RABBITMQ_CLIENT  | Use the RabbitMQ connection string     
+Webserver                 | PORT                        | Run the node on a different port        
 
 ### Running
 
