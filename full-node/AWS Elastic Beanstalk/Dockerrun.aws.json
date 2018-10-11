@@ -14,6 +14,12 @@
       "image": "legalthings/anchor",
       "essential": true,
       "memoryReservation": 128,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "lto"
+        }
+      ],
       "links": [
         "public-node",
         "redis"
@@ -36,6 +42,12 @@
       "image": "legalthings/webserver",
       "essential": true,
       "memoryReservation": 128,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        }
+      ],
       "portMappings": [
         {
           "hostPort": 80,

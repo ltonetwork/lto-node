@@ -11,6 +11,7 @@ services:
       image: legalthings/anchor
       environment:
       - LTO_API_KEY=<a secret to use the api>
+      - NODE_ENV=lto
       networks:
       - lto
       depends_on:
@@ -40,7 +41,7 @@ services:
       container_name: webserver
       image: legalthings/webserver
       environment:
-       - LOG_LEVEL=debug
+       - NODE_ENV=production
       ports:
         - "3000:80"
       networks:
