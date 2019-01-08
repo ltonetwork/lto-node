@@ -10,13 +10,13 @@
     {
       "name": "redis-data",
       "host": {
-        "sourcePath": "/lto/data"
+        "sourcePath": "/lto/redis/data"
       }
     }
   ],
   "containerDefinitions": [
     {
-      "name": "webserver",
+      "name": "anchor",
       "image": "legalthings/anchor",
       "essential": true,
       "memoryReservation": 128,
@@ -24,6 +24,12 @@
         {
           "hostPort": 80,
           "containerPort": 80
+        }
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "lto"
         }
       ],
       "links": [
@@ -47,7 +53,7 @@
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memory": 384,
+      "memoryReservation": 384,
       "mountPoints": [
         {
           "sourceVolume": "redis-data",
