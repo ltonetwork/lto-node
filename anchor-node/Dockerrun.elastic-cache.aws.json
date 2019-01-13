@@ -34,6 +34,12 @@
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
         }
+      ],
+      "environment": [
+        {
+          "name": "ENABLE_REST_API",
+          "value": "true"
+        }
       ]
     }
   ]
