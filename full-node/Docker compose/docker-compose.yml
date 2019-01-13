@@ -22,6 +22,7 @@ services:
       container_name: public-node
       image: legalthings/public-node
       environment:
+      - ENABLE_REST_API=true
       - LTO_WALLET_SEED=<seed of your wallet>
       - LTO_API_KEY=<a secret to use the api>
       networks:
