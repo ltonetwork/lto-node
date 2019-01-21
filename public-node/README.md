@@ -10,6 +10,8 @@ Before you run the node you will need to configure a few environment variables p
 3. LTO_WALLET_PASSWORD: This password is used to encrypt your seed on disk.
 4. LTO_API_KEY: Choose an api-key to be able to perform certain actions in the GUI.
 5. LTO_NETWORK: Choose the network you want to connect your node to. The options are: `MAINNET` and `TESTNET` (default is`MAINNET`).
+6. LTO_DECLARED_ADDRESS: If you have your node running on a vps set you public ip here with your port. E.g. `52.50.202.26:6868`
+
 
 For other options check out: [Public Node on Github](https://github.com/legalthings/docker-public-node)
 
