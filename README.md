@@ -1,7 +1,5 @@
 # LTO Network
 
-## Installation
-
 There are 3 configuration variations of the node. Each configuration serves a different need of the node:
 
 Node Type             |Description
@@ -13,7 +11,7 @@ Node Type             |Description
 [Public Node only]: https://github.com/ltonetwork/lto-public-node
 [Anchor Node]: https://github.com/ltonetwork/lto-anchor-node
 
-# Full Node
+# LTO Network Full Node
 
 A Full Node can be setup using different orchestration tools.
 
