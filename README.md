@@ -1,4 +1,19 @@
-# LTO Network Full Node
+# LTO Network
+
+## Installation
+
+There are 3 configuration variations of the node. Each configuration serves a different need of the node:
+
+Node Type             |Description
+----------------------|-----------
+[Public Node only]    |Contains only the public node. This configuration can be used for mining 
+[Anchor Node]         |Contains both the public node and the anchoring service. This configuration can be used for the anchoring of hashes of the public LTO chain 
+**Full Node**         |Contains all services. This configuration can used to run decentralized workflows
+
+[Public Node only]: https://github.com/ltonetwork/lto-public-node
+[Anchor Node]: https://github.com/ltonetwork/lto-anchor-node
+
+# Full Node
 
 A Full Node can be setup using different orchestration tools.
 
@@ -7,8 +22,6 @@ Orchestration Tool
 - [AWS Elastic Beanstalk](AWS%20Elastic%20Beanstalk)
 - [Docker compose](Docker%20compose)
 - [Kubernetes](Kubernetes) (Coming soon)
-
-## Running a node
 
 ## TestNet
  
@@ -25,3 +38,4 @@ For mainnet you will have to buy tokens. You can then use these tokens by sendin
 The wallet can be found here: [https://wallet.lto.network](https://wallet.lto.network)
  
 The explorer can be found here: [https://explorer.lto.network](https://explorer.lto.network)
+
