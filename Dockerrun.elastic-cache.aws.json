@@ -13,6 +13,12 @@
       "name": "anchor",
       "image": "legalthings/anchor",
       "essential": true,
+      "environment": [
+        {
+          "name": "STORAGE_TYPE",
+          "value": "redis"
+        }
+      ],
       "memoryReservation": 128,
       "portMappings": [
         {

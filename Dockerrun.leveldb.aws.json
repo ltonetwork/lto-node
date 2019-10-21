@@ -8,9 +8,9 @@
       }
     },
     {
-      "name": "redis-data",
+      "name": "lto-anchor",
       "host": {
-        "sourcePath": "/lto/redis/data"
+        "sourcePath": "/lto/anchor-db"
       }
     }
   ],
@@ -19,12 +19,6 @@
       "name": "anchor",
       "image": "legalthings/anchor",
       "essential": true,
-      "environment": [
-        {
-          "name": "STORAGE_TYPE",
-          "value": "redis"
-        }
-      ],
       "memoryReservation": 128,
       "portMappings": [
         {
@@ -32,15 +26,14 @@
           "containerPort": 80
         }
       ],
-      "environment": [
+      "mountPoints": [
         {
-          "name": "NODE_ENV",
-          "value": "lto"
+          "sourceVolume": "lto-anchor",
+          "containerPath": "/usr/app/anchor-db"
         }
       ],
       "links": [
-        "public-node",
-        "redis"
+        "public-node"
       ]
     },
     {
@@ -58,18 +51,6 @@
         {
           "name": "ENABLE_REST_API",
           "value": "true"
-        }
-      ]
-    },
-    {
-      "name": "redis",
-      "image": "redis",
-      "essential": true,
-      "memoryReservation": 384,
-      "mountPoints": [
-        {
-          "sourceVolume": "redis-data",
-          "containerPath": "/data"
         }
       ]
     }
