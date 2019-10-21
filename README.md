@@ -28,6 +28,7 @@ For other options check out: [Public Node on Github](https://github.com/legalthi
 
 **Anchor service**
 1. LTO_API_KEY: The same ApiKey as was set in the `Public Node`. 
+2. STORAGE_TYPE: Select how the index should be stored. OOptions are `redis` and `leveldb` (default).
 
 ## Run on a (virtual) machine
 
@@ -49,10 +50,11 @@ Or you can use a reverse proxy like NGINX to make the node publicly available. T
 
 ## Run in AWS Elastic Beanstalk
 Running the node using AWS Elastic Beanstalk (EB) it will only install the services on a machine. This node includes a
-Redis database, however it is highly recommended to use AWS Elastic Cache. The are 2 EB configuration files included. 
+Redis database, however it is highly recommended to use AWS Elastic Cache. The are 3 EB configuration files included. 
 
 1. Dockerrun.elastic-cache.aws.json
 2. Dockerrun.redis.aws.json
+3. Dockerrun.leveldb.aws.json
 
 Take to following steps to install the node on EB:
 
