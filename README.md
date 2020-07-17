@@ -22,8 +22,9 @@ Before you run the node you will need to configure a few environment variables p
 2. LTO_WALLET_SEED_BASE58: The seed of your wallet but then base58 encoded. This will overwrite the LTO_WALLET_SEED
 3. LTO_WALLET_PASSWORD: This password is used to encrypt your seed on disk.
 4. LTO_API_KEY: Choose an api-key to be able to perform certain actions in the GUI.
-5. LTO_NETWORK: Choose the network you want to connect your node to. The options are: `MAINNET` and `TESTNET` (default is`MAINNET`).
-6. LTO_DECLARED_ADDRESS: If you have your node running on a vps set you public ip here with your port. E.g. `52.50.202.26:6868`
+5. LTO_ENABLE_REST_API: To enable the REST API. (For Mainnet default is false for Testnet default is true)
+6. LTO_NETWORK: Choose the network you want to connect your node to. The options are: `MAINNET` and `TESTNET` (default is`MAINNET`).
+7. LTO_DECLARED_ADDRESS: If you have your node running on a VPS set you public ip here with your port. E.g. `52.50.202.26:6868`
 
 For other options check out the [Docker container of the Public Node on Github](https://github.com/legalthings/docker-public-node).
 
@@ -69,7 +70,7 @@ You can find the API documentation on the url where your node is deployed.
 
 ## Running a node
 
-### TestNet
+### Testnet
  
 If you wish to start testing with our testnet. Please create a wallet on: [https://testnet-wallet.lto.network](https://testnet-wallet.lto.network)
  
