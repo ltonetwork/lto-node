@@ -8,16 +8,16 @@
       }
     },
     {
-      "name": "lto-anchor",
+      "name": "lto-index",
       "host": {
-        "sourcePath": "/lto/anchor-db"
+        "sourcePath": "/lto/index"
       }
     }
   ],
   "containerDefinitions": [
     {
-      "name": "anchor",
-      "image": "legalthings/anchor",
+      "name": "indexer",
+      "image": "legalthings/indexer",
       "essential": true,
       "memoryReservation": 128,
       "portMappings": [
@@ -28,8 +28,8 @@
       ],
       "mountPoints": [
         {
-          "sourceVolume": "lto-anchor",
-          "containerPath": "/usr/app/anchor-db"
+          "sourceVolume": "lto-index",
+          "containerPath": "/usr/app/index"
         }
       ],
       "links": [

@@ -10,8 +10,8 @@
   ],
   "containerDefinitions": [
     {
-      "name": "anchor",
-      "image": "legalthings/anchor",
+      "name": "indexer",
+      "image": "legalthings/indexer",
       "essential": true,
       "environment": [
         {

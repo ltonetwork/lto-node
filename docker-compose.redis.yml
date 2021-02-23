@@ -6,9 +6,9 @@ services:
     networks:
       - lto
 
-  anchor:
-    container_name: anchor
-    image: legalthings/anchor
+  indexer:
+    container_name: indexer
+    image: legalthings/indexer
     environment:
       - LTO_API_KEY=<a secret to use the api>
       - NODE_ENV=lto
@@ -35,8 +35,4 @@ services:
 networks:
   lto:
     driver: bridge
-
-
-
-
 

@@ -1,17 +1,19 @@
-# LTO Network
+![LTO Network](https://user-images.githubusercontent.com/100821/108692834-6a115200-74fd-11eb-92df-ee07bf62b386.png)
 
-There are 3 configuration variations of the node. Each configuration serves a different need of the node:
+There are 4 configuration variations of the node. Each configuration serves a different need of the node:
 
 Node Type             |Description
 ----------------------|-----------
 [Public Node only]    |Contains only the public node. This configuration can be used for mining 
-**Anchor Node**       |Contains both the public node and the anchoring service. This configuration can be used for the anchoring of hashes of the public LTO chain 
+[Anchor Node]         |Contains both the public node and the indexer. The indexer is configured for the anchoring of hashes
+**Identity Node**     |Contains both the public node and the indexer. The indexer is configured for DID documents and trust networks
 [Full Node]           |Contains all services. This configuration can used to run decentralized workflows
 
 [Public Node only]: https://github.com/ltonetwork/lto-public-node
+[Anchor Node]: https://github.com/ltonetwork/lto-anchor-node
 [Full Node]: https://github.com/ltonetwork/lto-full-node
 
-# LTO Network Anchor Node
+# LTO Network Identity Node
 
 ## Configuration
 
@@ -26,9 +28,9 @@ Before you run the node you will need to configure a few environment variables p
 
 For other options check out: [Public Node on Github](https://github.com/legalthings/docker-public-node)
 
-**Anchor service**
+**Indexer service**
 1. LTO_API_KEY: The same ApiKey as was set in the `Public Node`. 
-2. STORAGE_TYPE: Select how the index should be stored. OOptions are `redis` and `leveldb` (default).
+2. STORAGE_TYPE: Select how the index should be stored. Options are `redis` and `leveldb` (default).
 
 ## Run on a (virtual) machine
 
