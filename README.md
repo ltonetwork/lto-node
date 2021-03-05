@@ -1,15 +1,17 @@
-# LTO Network
+![LTO Network](https://user-images.githubusercontent.com/100821/108692834-6a115200-74fd-11eb-92df-ee07bf62b386.png)
 
-There are 3 configuration variations of the node. Each configuration serves a different need of the node:
+There are 4 configuration variations of the node. Each configuration serves a different need of the node:
 
 Node Type             |Description
 ----------------------|-----------
 [Public Node only]    |Contains only the public node. This configuration can be used for mining 
-[Anchor Node]         |Contains both the public node and the anchoring service. This configuration can be used for the anchoring of hashes of the public LTO chain 
+[Anchor Node]         |Contains both the public node and the indexer. The indexer is configured for the anchoring of hashes
+[Identity Node]       |Contains both the public node and the indexer. The indexer is configured for DID documents and trust networks
 **Full Node**         |Contains all services. This configuration can used to run decentralized workflows
 
 [Public Node only]: https://github.com/ltonetwork/lto-public-node
 [Anchor Node]: https://github.com/ltonetwork/lto-anchor-node
+[Identity Node]: https://github.com/ltonetwork/lto-identity-node
 
 # LTO Network Full Node
 
@@ -25,7 +27,7 @@ Orchestration Tool
  
 If you wish to start testing with our testnet. Please create a wallet on: [https://testnet-wallet.lto.network](https://testnet-wallet.lto.network)
  
-Send you address to our [support](mailto:support@legalthings.io) so we will deposit some LTO for testing on the testnet. Or request your tokens via our [telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
+Request testnet tokens via our ["LTO Tech" telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
  
 To view all the transactions on the testnet you can check out our explorer on: [https://testnet-explorer.lto.network](https://testnet-explorer.lto.network)
  
