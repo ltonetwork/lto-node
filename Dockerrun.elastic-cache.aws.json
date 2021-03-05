@@ -11,7 +11,7 @@
   "containerDefinitions": [
     {
       "name": "indexer",
-      "image": "legalthings/indexer",
+      "image": "ltonetwork/indexer",
       "essential": true,
       "environment": [
         {
@@ -32,7 +32,7 @@
     },
     {
       "name": "public-node",
-      "image": "legalthings/public-node",
+      "image": "ltonetwork/public-node",
       "essential": true,
       "memoryReservation": 1024,
       "mountPoints": [

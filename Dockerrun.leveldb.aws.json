@@ -17,7 +17,7 @@
   "containerDefinitions": [
     {
       "name": "indexer",
-      "image": "legalthings/indexer",
+      "image": "ltonetwork/indexer",
       "essential": true,
       "memoryReservation": 128,
       "portMappings": [
@@ -38,7 +38,7 @@
     },
     {
       "name": "public-node",
-      "image": "legalthings/public-node",
+      "image": "ltonetwork/public-node",
       "essential": true,
       "memoryReservation": 1024,
       "mountPoints": [

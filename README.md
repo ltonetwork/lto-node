@@ -26,7 +26,7 @@ Before you run the node you will need to configure a few environment variables p
 4. LTO_API_KEY: Choose an api-key this need to be same in the `Anchor service` so that is able to communicate with the public node.
 5. LTO_NETWORK: Choose the network you want to connect your node to. The options are: `MAINNET` and `TESTNET` (default is`MAINNET`).
 
-For other options check out: [Public Node on Github](https://github.com/legalthings/docker-public-node)
+For other options check out: [Public Node on Github](https://github.com/ltonetwork/docker-public-node)
 
 **Indexer service**
 1. LTO_API_KEY: The same ApiKey as was set in the `Public Node`. 
@@ -86,7 +86,7 @@ You can find the API documentation on the url where your node is deployed.
  
 If you wish to start testing with our testnet. Please create a wallet on: [https://testnet-wallet.lto.network](https://testnet-wallet.lto.network)
  
-Send you address to our [support](mailto:support@legalthings.io) so we will deposit some LTO for testing on the testnet. Or request your tokens via our [telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
+Send you address to our [support](mailto:support@ltonetwork.io) so we will deposit some LTO for testing on the testnet. Or request your tokens via our [telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
  
 To view all the transactions on the testnet you can check out our explorer on: [https://testnet-explorer.lto.network](https://testnet-explorer.lto.network)
  
