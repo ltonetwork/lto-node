@@ -32,6 +32,12 @@
           "containerPath": "/usr/app/anchor-db"
         }
       ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "lto"
+        }
+      ],
       "links": [
         "public-node"
       ]
