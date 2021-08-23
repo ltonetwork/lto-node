@@ -1,0 +1,79 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "lto-data",
+      "host": {
+        "sourcePath": "/lto/data"
+      }
+    },
+    {
+      "name": "redis-data",
+      "host": {
+        "sourcePath": "/lto/redis/data"
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "legalthings/public-node-proxy",
+      "essential": true,
+      "memoryReservation": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": [
+        "anchor",
+        "public-node"
+      ]
+    },
+    {
+      "name": "indexer",
+      "image": "legalthings/indexer",
+      "essential": true,
+      "memoryReservation": 128,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "lto"
+        },
+        {
+          "name": "STORAGE_TYPE",
+          "value": "redis"
+        }
+      ],
+      "links": [
+        "public-node",
+        "redis"
+      ]
+    },
+    {
+      "name": "public-node",
+      "image": "legalthings/public-node",
+      "essential": true,
+      "memoryReservation": 1024,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-data",
+          "containerPath": "/lto/data"
+        }
+      ]
+    },
+    {
+      "name": "redis",
+      "image": "redis",
+      "essential": true,
+      "memoryReservation": 384,
+      "mountPoints": [
+        {
+          "sourceVolume": "redis-data",
+          "containerPath": "/data"
+        }
+      ]
+    }
+  ]
+}

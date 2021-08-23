@@ -1,0 +1,56 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "volumes": [
+    {
+      "name": "lto-data",
+      "host": {
+        "sourcePath": "/lto/data"
+      }
+    }
+  ],
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "ltonetwork/public-node-proxy",
+      "essential": true,
+      "memoryReservation": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": [
+        "indexer",
+        "public-node"
+      ]
+    },
+    {
+      "name": "indexer",
+      "image": "ltonetwork/indexer",
+      "essential": true,
+      "memoryReservation": 128,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "lto"
+        }
+      ],
+      "links": [
+        "public-node"
+      ]
+    },
+    {
+      "name": "public-node",
+      "image": "ltonetwork/public-node",
+      "essential": true,
+      "memoryReservation": 1024,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-data",
+          "containerPath": "/lto/data"
+        }
+      ]
+    }
+  ]
+}
