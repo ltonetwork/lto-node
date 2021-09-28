@@ -26,10 +26,7 @@
           "containerPort": 80
         }
       ],
-      "links": [
-        "anchor",
-        "public-node"
-      ]
+      "links": ["anchor", "public-node"]
     },
     {
       "name": "indexer",
@@ -39,17 +36,42 @@
       "environment": [
         {
           "name": "NODE_ENV",
-          "value": "lto"
+          "value": "production"
+        },
+        {
+          "name": "NODE_URL",
+          "value": "http://public-node:6869"
         },
         {
           "name": "STORAGE_TYPE",
           "value": "redis"
+        },
+        {
+          "name": "REDIS_URL",
+          "value": "redis://redis"
+        },
+        {
+          "name": "TRANSACTION_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "ASSOCIATION_INDEXING",
+          "value": "all"
+        },
+        {
+          "name": "IDENTITY_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "ANCHOR_INDEXING",
+          "value": "all"
+        },
+        {
+          "name": "STATS_INDEXING",
+          "value": "true"
         }
       ],
-      "links": [
-        "public-node",
-        "redis"
-      ]
+      "links": ["public-node", "redis"]
     },
     {
       "name": "public-node",
