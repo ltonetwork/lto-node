@@ -83,6 +83,12 @@
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
         }
+      ],
+      "environment": [
+        {
+          "name": "LTO_NETWORK",
+          "value": "TESTNET"
+        }
       ]
     },
     {
