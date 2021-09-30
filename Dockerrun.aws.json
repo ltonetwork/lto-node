@@ -27,12 +27,6 @@
       "image": "ltonetwork/indexer",
       "essential": true,
       "memory": 128,
-      "portMappings": [
-        {
-          "hostPort": 80,
-          "containerPort": 80
-        }
-      ],
       "environment": [
         {
           "name": "NODE_ENV",
@@ -70,12 +64,6 @@
       "image": "ltonetwork/public-node:v1.4.1",
       "essential": true,
       "memory": 128,
-      "portMappings": [
-        {
-          "hostPort": 6869,
-          "containerPort": 6869
-        }
-      ],
       "mountPoints": [
         {
           "sourceVolume": "lto-data",
