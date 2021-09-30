@@ -77,7 +77,7 @@
       "name": "public-node",
       "image": "ltonetwork/public-node:v1.4.1",
       "essential": true,
-      "memory": 1024,
+      "memory": 128,
       "mountPoints": [
         {
           "sourceVolume": "lto-data",
@@ -95,7 +95,7 @@
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memory": 512,
+      "memory": 128,
       "mountPoints": [
         {
           "sourceVolume": "redis-data",

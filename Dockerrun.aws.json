@@ -4,7 +4,7 @@
     {
       "name": "lto-data",
       "host": {
-        "sourcePath": "/tmp/lto/data"
+        "sourcePath": "/lto/data"
       }
     }
   ],
@@ -63,7 +63,7 @@
       "name": "public-node",
       "image": "ltonetwork/public-node:v1.4.1",
       "essential": true,
-      "memory": 1024,
+      "memory": 128,
       "mountPoints": [
         {
           "sourceVolume": "lto-data",
