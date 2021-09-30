@@ -1,34 +1,57 @@
 version: '3'
 
 services:
+  nginx:
+    container_name: nginx
+    image: ltonetwork/public-node-proxy
+    mem_limit: 134217728 # 128mb
+    ports:
+      - 80:80
+    depents_on:
+      - indexer
+      - public-node
+    networks:
+      - lto
+
   redis:
+    container_name: redis
     image: redis
+    volumes:
+      - /lto/redis/data:/lto
     networks:
       - lto
 
   indexer:
     container_name: indexer
     image: legalthings/indexer
+    mem_limit: 134217728 # 128mb
     environment:
-      - LTO_API_KEY=<a secret to use the api>
-      - NODE_ENV=lto
+      - NODE_ENV=production
+      - NODE_URL=http://public-node:6869
       - STORAGE_TYPE=redis
+      - REDIS_URL=redis://redis
+      - TRANSACTION_INDEXING=true
+      - ASSOCIATION_INDEXING=all
+      - IDENTITY_INDEXING=true
+      - ANCHOR_INDEXING=all
+      - STATS_INDEXING=true
     ports:
       - 80:80
+    depends_on:
+      - public-node
+      - redis
     networks:
       - lto
-    depends_on:
-      - redis
-      - public-node
 
   public-node:
     container_name: public-node
-    image: legalthings/public-node
+    image: ltonetwork/public-node:v1.4.1
+    mem_limit: 134217728 # 128mb
+    volumes:
+      - /lto/data:/lto
     environment:
       - ENABLE_REST_API=true
-      - LTO_WALLET_SEED=<seed of your wallet>
-      - LTO_WALLET_PASSWORD=<a password for your wallet>
-      - LTO_API_KEY=<a secret to use the api>
+      - LTO_NETWORK=TESTNET
     networks:
       - lto
 

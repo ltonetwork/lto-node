@@ -19,7 +19,7 @@
       "name": "nginx",
       "image": "legalthings/public-node-proxy",
       "essential": true,
-      "memoryReservation": 128,
+      "memory": 128,
       "portMappings": [
         {
           "hostPort": 80,
@@ -32,7 +32,7 @@
       "name": "indexer",
       "image": "legalthings/indexer",
       "essential": true,
-      "memoryReservation": 128,
+      "memory": 128,
       "environment": [
         {
           "name": "NODE_ENV",
@@ -75,9 +75,9 @@
     },
     {
       "name": "public-node",
-      "image": "legalthings/public-node",
+      "image": "ltonetwork/public-node:v1.4.1",
       "essential": true,
-      "memoryReservation": 1024,
+      "memory": 128,
       "mountPoints": [
         {
           "sourceVolume": "lto-data",
@@ -95,7 +95,7 @@
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memoryReservation": 384,
+      "memory": 128,
       "mountPoints": [
         {
           "sourceVolume": "redis-data",
