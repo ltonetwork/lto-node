@@ -84,6 +84,10 @@
       ],
       "environment": [
         {
+          "name": "ENABLE_REST_API",
+          "value": "true"
+        },
+        {
           "name": "LTO_NETWORK",
           "value": "TESTNET"
         }
