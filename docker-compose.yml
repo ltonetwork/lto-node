@@ -4,7 +4,7 @@ services:
   nginx:
     container_name: nginx
     image: ltonetwork/public-node-proxy
-    mem_limit: 134217728 # 128mb
+    mem_limit: 256m
     ports:
       - 80:80
     depents_on:
@@ -16,7 +16,7 @@ services:
   indexer:
     container_name: indexer
     image: legalthings/indexer
-    mem_limit: 134217728 # 128mb
+    mem_limit: 256m
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
@@ -34,8 +34,8 @@ services:
 
   public-node:
     container_name: public-node
-    image: ltonetwork/public-node:v1.4.1
-    mem_limit: 134217728 # 128mb
+    image: ltonetwork/public-node
+    mem_limit: 1g
     volumes:
       - /lto/data:/lto
     environment:
