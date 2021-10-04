@@ -4,6 +4,10 @@
 
 NGINX setup for LTO [public node](https://github.com/ltonetwork/lto-public-chain) + [indexer](https://github.com/ltonetwork/indexer)
 
+## Memory
+
+It is recommended to have at least 2gb of RAM to run this configuration, as the public node alone is configured for 1024mb. Lower memory allocation could result in the node becoming unresponsive.
+
 ## Configuration
 
 Under the `Dockerrun.json` files, you can configure environment variables for the containers. If you want the `indexer` to run with all the functionalities, be sure to provide the following variables:
