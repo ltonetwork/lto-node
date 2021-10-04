@@ -72,8 +72,8 @@ The indexer is already configured to track all of the available options, but you
 The node configuration comes with Redis, RabbitMQ and MongoDB included. It is adviced to run these services outside of 
 the node. The following Environment properties can be used to connect to external services:
 
-| Service                   | Variable                    | Description                                                                         |
-| ------------------------- | ----------------------------| ----------------------------------------------------------------------------------- |
+| Service                   | Variable                      | Description                                                                         |
+| ------------------------- | ------------------------------| ----------------------------------------------------------------------------------- |
 | LegalEvents / Legalflow   | `MONGODB_URL`                 | Use the MongoDB connection string                                                   |
 | Event Dispatcher          | `DISPATCHER_RABBITMQ_CLIENT`  | Use the RabbitMQ connection string                                                  |
 | Webserver                 | `PORT`                        | Run the node on a different port                                                    |
