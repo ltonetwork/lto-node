@@ -1,42 +1,58 @@
 version: '3'
 
 services:
-  redis:
-    image: redis
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node
+    mem_limit: 1g
+    volumes:
+      - ./volumes/public-node:/lto
+    ports:
+      - 6869:6869
+    environment:
+      - LTO_NETWORK=TESTNET
     networks:
       - lto
 
-  anchor:
-    container_name: anchor
-    image: legalthings/anchor
+  redis:
+    container_name: redis
+    image: redis
+    volumes:
+      - ./volumes/redis:/lto
+    ports:
+      - 6379:6379
+    networks:
+      - lto
+
+  graph:
+    container_name: graph
+    image: redislabs/redisgraph
+    volumes:
+      - ./volumes/redis-graph:/lto
+    ports:
+      - 6380:6379
+    networks:
+      - lto
+
+  indexer:
+    container_name: indexer
+    image: ltonetwork/indexer
     environment:
-      - LTO_API_KEY=<a secret to use the api>
-      - NODE_ENV=lto
+      - NODE_ENV=production
+      - NODE_URL=http://public-node:6869
       - STORAGE_TYPE=redis
+      - REDIS_URL=redis://redis
+      - REDIS_GRAPH_HOST=graph
+      - REDIS_GRAPH_PORT=6379
+      - TRANSACTION_INDEXING=true
+      - ANCHOR_INDEXING=all
     ports:
       - 80:80
     networks:
       - lto
     depends_on:
-      - redis
       - public-node
-
-  public-node:
-    container_name: public-node
-    image: legalthings/public-node
-    environment:
-      - ENABLE_REST_API=true
-      - LTO_WALLET_SEED=<seed of your wallet>
-      - LTO_WALLET_PASSWORD=<a password for your wallet>
-      - LTO_API_KEY=<a secret to use the api>
-    networks:
-      - lto
 
 networks:
   lto:
     driver: bridge
-
-
-
-
-

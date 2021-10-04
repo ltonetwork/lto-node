@@ -6,45 +6,12 @@
       "host": {
         "sourcePath": "/lto/data"
       }
-    },
-    {
-      "name": "lto-anchor",
-      "host": {
-        "sourcePath": "/lto/anchor-db"
-      }
     }
   ],
   "containerDefinitions": [
     {
-      "name": "anchor",
-      "image": "legalthings/anchor",
-      "essential": true,
-      "memoryReservation": 128,
-      "portMappings": [
-        {
-          "hostPort": 80,
-          "containerPort": 80
-        }
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "lto-anchor",
-          "containerPath": "/usr/app/anchor-db"
-        }
-      ],
-      "environment": [
-        {
-          "name": "NODE_ENV",
-          "value": "lto"
-        }
-      ],
-      "links": [
-        "public-node"
-      ]
-    },
-    {
       "name": "public-node",
-      "image": "legalthings/public-node",
+      "image": "ltonetwork/public-node",
       "essential": true,
       "memoryReservation": 1024,
       "mountPoints": [
@@ -52,11 +19,29 @@
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
         }
-      ],
+      ]
+    },
+    {
+      "name": "indexer",
+      "image": "ltonetwork/indexer",
+      "essential": true,
+      "memoryReservation": 128,
       "environment": [
         {
-          "name": "ENABLE_REST_API",
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "NODE_URL",
+          "value": "http://public-node:6869"
+        },
+        {
+          "name": "TRANSACTION_INDEXING",
           "value": "true"
+        },
+        {
+          "name": "ANCHOR_INDEXING",
+          "value": "all"
         }
       ]
     }
