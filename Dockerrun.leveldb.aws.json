@@ -6,36 +6,9 @@
       "host": {
         "sourcePath": "/lto/data"
       }
-    },
-    {
-      "name": "lto-index",
-      "host": {
-        "sourcePath": "/lto/index"
-      }
     }
   ],
   "containerDefinitions": [
-    {
-      "name": "indexer",
-      "image": "ltonetwork/indexer",
-      "essential": true,
-      "memoryReservation": 128,
-      "portMappings": [
-        {
-          "hostPort": 80,
-          "containerPort": 80
-        }
-      ],
-      "mountPoints": [
-        {
-          "sourceVolume": "lto-index",
-          "containerPath": "/usr/app/index"
-        }
-      ],
-      "links": [
-        "public-node"
-      ]
-    },
     {
       "name": "public-node",
       "image": "ltonetwork/public-node",
@@ -46,11 +19,41 @@
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
         }
-      ],
+      ]
+    },
+    {
+      "name": "indexer",
+      "image": "ltonetwork/indexer",
+      "essential": true,
+      "memoryReservation": 128,
       "environment": [
         {
-          "name": "ENABLE_REST_API",
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "NODE_URL",
+          "value": "http://public-node:6869"
+        },
+        {
+          "name": "TRANSACTION_INDEXING",
           "value": "true"
+        },
+        {
+          "name": "ASSOCIATION_INDEXING",
+          "value": "all"
+        },
+        {
+          "name": "IDENTITY_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "TRUST_NETWORK_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "TRUST_NETWORK_ROLES",
+          "value": "{\"root\": {\"description\": \"The root role\",\"issues\": [{ \"type\": 100, \"role\": \"university\" }]},\"university\": {\"description\": \"University\"}}"
         }
       ]
     }

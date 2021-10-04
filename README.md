@@ -17,20 +17,71 @@ Node Type             |Description
 
 ## Configuration
 
-Before you run the node you will need to configure a few environment variables per service:
+The configuration can be done via the `./docker-compose.yml` file.
 
-**Public Node Container**
-1. LTO_WALLET_SEED: The seed of your wallet. Your account will need at least 1000 LTO to be able to start mining.
-2. LTO_WALLET_SEED_BASE58: The seed of your wallet but then base58 encoded. This will overwrite the LTO_WALLET_SEED
-3. LTO_WALLET_PASSWORD: This password is used to encrypt your seed on disk.
-4. LTO_API_KEY: Choose an api-key this need to be same in the `Anchor service` so that is able to communicate with the public node.
-5. LTO_NETWORK: Choose the network you want to connect your node to. The options are: `MAINNET` and `TESTNET` (default is`MAINNET`).
+### Volumes
 
-For other options check out: [Public Node on Github](https://github.com/ltonetwork/docker-public-node)
+By default, the volumes for the containers are each mounted under `./volumes/`. You can change this for each service to mount to a different folder on your device. Example:
 
-**Indexer service**
-1. LTO_API_KEY: The same ApiKey as was set in the `Public Node`. 
-2. STORAGE_TYPE: Select how the index should be stored. Options are `redis` and `leveldb` (default).
+```yml
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node
+    mem_limit: 1g
+    volumes:
+      - /<YOUR-FOLDER-HERE>/public-node:/lto
+    environment:
+      - LTO_NETWORK=TESTNET
+    networks:
+      - lto
+```
+
+### Required fields
+
+There are different required fields, they are mentioned per service:
+
+*Public Node*
+
+| variable name          | description                                                                                     | format                 | extra information                                                             |
+| ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| `LTO_API_KEY`          | API key to protect restricted functions (random secret)                                         | string                 | This can be any string                                                        |
+| `LTO_NETWORK`          | Which network to attach the node to                                                             | `MAINNET`, `TESTNET`   | Default is set to `TESTNET`                                                   |
+| `LTO_WALLET_SEED`      | The seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions. | string                 | Can also be set as `LTO_WALLET_SEED_BASE58`, which will take a `base58` value |
+
+*Indexer*
+
+| variable name          | description                                                                                     | format                 | extra information                                                             |
+| ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
+| `NODE_API_KEY`         | API key to protect restricted functions (random secret)                                         | string                 | Make sure to match the same value as the *Public Node* configuration          |
+
+**Note**
+
+The indexer is configured to run as an identity service, but you can customize to your liking. You can see the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more on how to configure the indexer.
+
+### Trust Network
+
+The trust network configuration is done via the following variables:
+
+| variable name            | description                                                                                     | format                 | extra information                                                                                                                                             |
+| ------------------------ | ----------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TRUST_NETWORK_INDEXING` | Flag that allows the service to index trust network roles and transactions                      | boolean                | Needs to be set to `true` if you want to run a trust network                                                                                                  |
+| `TRUST_NETWORK_ROLES`    | The roles for the trust network, in a JSON format                                               | object                 | As this variable is an object, it needs to be encased in single quotes `'` to work. For the `Dockerrun` files, you need to escape the double quotes with `\"` |
+
+By default, this node comes with an example for trust network configuration, which you can find on the file `trust-network-example.json`. You can modify this file to your liking, but don't forget to copy the contents into the `TRUST_NETWORK_ROLES` in the `docker-compose` file.
+
+You can read more about the trust network [here](https://docs.ltonetwork.com/v/edge/node/identity-node/configuration-1/configuration).
+
+### Connecting to External Services
+
+The node configuration comes with Redis, RabbitMQ and MongoDB included. It is adviced to run these services outside of 
+the node. The following Environment properties can be used to connect to external services:
+
+| Service                   | Variable                      | Description                                                                         |
+| ------------------------- | ------------------------------| ----------------------------------------------------------------------------------- |
+| LegalEvents / Legalflow   | `MONGODB_URL`                 | Use the MongoDB connection string                                                   |
+| Event Dispatcher          | `DISPATCHER_RABBITMQ_CLIENT`  | Use the RabbitMQ connection string                                                  |
+| Webserver                 | `PORT`                        | Run the node on a different port                                                    |
+| Indexer                   | `REDIS_URL`                   | See the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more |
 
 ## Run on a (virtual) machine
 
@@ -51,14 +102,14 @@ This way the node will be accessible via port 80.
 Or you can use a reverse proxy like NGINX to make the node publicly available. This is highly recommended. 
 
 ## Run in AWS Elastic Beanstalk
-Running the node using AWS Elastic Beanstalk (EB) it will only install the services on a machine. This node includes a
-Redis database, however it is highly recommended to use AWS Elastic Cache. The are 3 EB configuration files included. 
 
-1. Dockerrun.elastic-cache.aws.json
-2. Dockerrun.redis.aws.json
-3. Dockerrun.leveldb.aws.json
+Running the node using AWS Elastic Beanstalk (EB) will install the services on a cloud machine. This node includes a
+Redis database, however it is highly recommended to use AWS Elastic Cache. The are 2 EB configuration files included. 
 
-Take to following steps to install the node on EB:
+1. Dockerrun.redis.aws.json
+2. Dockerrun.leveldb.aws.json
+
+Take the following steps to install the node on EB:
 
 1. Choose if you wish to run the node with or without redis. Rename the correct config file to Dockerrun.aws.json
 2. Zip the Dockerrun.aws.json file
@@ -70,9 +121,12 @@ Take to following steps to install the node on EB:
 6. Configure more options
 7. Instances -> Instance type: Choose an instance with atleast 2 gb of memory (E.g. t2.small)
 6. Software -> Environment properties:
+    - Name: `LTO_NETWORK`, Value: `MAINNET` or `TESTNET` - the default is `MAINNET`, but you can set it to run a node on testnet if you wish
+    - Name: `LTO_API_KEY`, Value: `Any string` - this is your API key, can be any random string you wish
+    - Name: `NODE_API_KEY`, Value: `Same as LTO_API_KEY` - this is the API key for the `indexer` service, should be the same as `LTO_API_KEY`
     - Name: `LTO_WALLET_PASSWORD`, Value: `Your wallet password`
     - Name: `LTO_WALLET_SEED` or `LTO_WALLET_SEED_BASE58`, Value: `Wallet Seed`
-    - Name: `ANCHOR_REDIS_URL`, Value: `"<Your redis connection string>"` (If you are running with elastic cache)
+    - Name: `PUBLIC_HOSTNAME`, Value: `The hostname where the node is reachable. (This can be EB generated address)`
 
 Now your node is should good to go!
 
@@ -97,4 +151,3 @@ For mainnet you will have to buy tokens. You can then use these tokens by sendin
 The wallet can be found here: [https://wallet.lto.network](https://wallet.lto.network)
  
 The explorer can be found here: [https://explorer.lto.network](https://explorer.lto.network)
-
