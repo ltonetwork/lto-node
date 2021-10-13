@@ -16,20 +16,21 @@ Take to following steps to install the node on EB:
 6. Configure more options
 7. Instances -> Instance type: Choose an instance with atleast 2 gb of memory (E.g. t2.small)
 6. Software -> Environment properties:
+    - Name: `LTO_NETWORK`, Value: `MAINNET` or `TESTNET` - the default is `MAINNET`, but you can set it to run a node on testnet if you wish
+    - Name: `LTO_API_KEY`, Value: `Any string` - this is your API key, can be any random string you wish
+    - Name: `NODE_API_KEY`, Value: `Same as LTO_API_KEY` - this is the API key for the `indexer` service, should be the same as `LTO_API_KEY`
     - Name: `LTO_WALLET_PASSWORD`, Value: `Your wallet password`
     - Name: `LTO_WALLET_SEED` or `LTO_WALLET_SEED_BASE58`, Value: `Wallet Seed`
     - Name: `PUBLIC_HOSTNAME`, Value: `The hostname where the node is reachable. (This can be EB generated address)`
 
-Now your node is should good to go!
-
-### Other configuration options
+##### Connecting to External Services
 
 The node configuration comes with Redis, RabbitMQ and MongoDB included. It is adviced to run these services outside of 
 the node. The following Environment properties can be used to connect to external services:
 
-Service                   | Variable                    | Description                           
-------------------------- | ----------------------------| -------------------------------------
-LegelEvents / Legalflow   | MONGODB_URL                 | Use the MongoDB connection string    
-Anchor                    | ANCHOR_REDIS_URL            | Use the redis connection string      
-Event Dispatcher          | DISPATCHER_RABBITMQ_CLIENT  | Use the RabbitMQ connection string    
-
+| Service                   | Variable                    | Description                                                                         |
+| ------------------------- | ----------------------------| ----------------------------------------------------------------------------------- |
+| LegalEvents / Legalflow   | `MONGODB_URL`                 | Use the MongoDB connection string                                                   |
+| Event Dispatcher          | `DISPATCHER_RABBITMQ_CLIENT`  | Use the RabbitMQ connection string                                                  |
+| Webserver                 | `PORT`                        | Run the node on a different port                                                    |
+| Indexer                   | `REDIS_URL`                   | See the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more |

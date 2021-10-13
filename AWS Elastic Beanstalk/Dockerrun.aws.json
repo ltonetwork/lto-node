@@ -10,24 +10,8 @@
   ],
   "containerDefinitions": [
     {
-      "name": "anchor",
-      "image": "legalthings/anchor",
-      "essential": true,
-      "memoryReservation": 128,
-      "environment": [
-        {
-          "name": "NODE_ENV",
-          "value": "lto"
-        }
-      ],
-      "links": [
-        "public-node",
-        "redis"
-      ]
-    },
-    {
       "name": "public-node",
-      "image": "legalthings/public-node",
+      "image": "ltonetwork/public-node",
       "essential": true,
       "memoryReservation": 1024,
       "mountPoints": [
@@ -35,10 +19,56 @@
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
         }
-      ],
+      ]
+    },
+    {
+      "name": "indexer",
+      "image": "ltonetwork/indexer",
+      "essential": true,
+      "memoryReservation": 128,
       "environment": [
         {
-          "name": "ENABLE_REST_API",
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "NODE_URL",
+          "value": "http://public-node:6869"
+        },
+        {
+          "name": "STORAGE_TYPE",
+          "value": "redis"
+        },
+        {
+          "name": "REDIS_URL",
+          "value": "redis://redis"
+        },
+        {
+          "name": "REDIS_GRAPH_HOST",
+          "value": "graph"
+        },
+        {
+          "name": "REDIS_GRAPH_PORT",
+          "value": "6379"
+        },
+        {
+          "name": "TRANSACTION_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "ASSOCIATION_INDEXING",
+          "value": "all"
+        },
+        {
+          "name": "IDENTITY_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "ANCHOR_INDEXING",
+          "value": "all"
+        },
+        {
+          "name": "STATS_INDEXING",
           "value": "true"
         }
       ]
@@ -157,6 +187,18 @@
       "image": "redis",
       "essential": true,
       "memoryReservation": 128
+    },
+    {
+      "name": "graph",
+      "image": "redislabs/redisgraph",
+      "essential": true,
+      "memoryReservation": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-redis-graph",
+          "containerPath": "/lto"
+        }
+      ]
     },
     {
       "name": "rabbitmq",

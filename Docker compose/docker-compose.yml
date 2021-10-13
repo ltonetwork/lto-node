@@ -30,7 +30,7 @@ services:
       - APPLICATION_ENV=docker.dev-queue
       - phpmemory_limit=512M
     volumes:
-      - ./workflow-engine-config:/app/config/local
+      - ./volumes/workflow-engine:/app/config/local
     networks:
       - lto
     depends_on:
@@ -68,6 +68,61 @@ services:
     depends_on:
       - mongo
       - rabbitmq
+
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node
+    mem_limit: 1g
+    volumes:
+      - ./volumes/public-node:/lto
+    ports:
+      - 6869:6869
+    environment:
+      - LTO_NETWORK=TESTNET
+    networks:
+      - lto
+
+  redis:
+    container_name: redis
+    image: redis
+    volumes:
+      - ./volumes/redis:/lto
+    ports:
+      - 6379:6379
+    networks:
+      - lto
+
+  graph:
+    container_name: graph
+    image: redislabs/redisgraph
+    volumes:
+      - ./volumes/redis-graph:/lto
+    ports:
+      - 6380:6379
+    networks:
+      - lto
+
+  indexer:
+    container_name: indexer
+    image: ltonetwork/indexer
+    environment:
+      - NODE_ENV=production
+      - NODE_URL=http://public-node:6869
+      - STORAGE_TYPE=redis
+      - REDIS_URL=redis://redis
+      - REDIS_GRAPH_HOST=graph
+      - REDIS_GRAPH_PORT=6379
+      - TRANSACTION_INDEXING=true
+      - ASSOCIATION_INDEXING=all
+      - IDENTITY_INDEXING=true
+      - ANCHOR_INDEXING=all
+      - STATS_INDEXING=true
+    ports:
+      - 80:80
+    networks:
+      - lto
+    depends_on:
+      - public-node
 
 networks:
   lto:
