@@ -26,40 +26,80 @@
           "containerPort": 80
         }
       ],
-      "links": [
-        "anchor",
-        "public-node"
-      ]
+      "links": ["anchor", "public-node"]
     },
     {
       "name": "indexer",
-      "image": "legalthings/indexer",
+      "image": "ltonetwork/indexer",
       "essential": true,
       "memoryReservation": 128,
       "environment": [
         {
           "name": "NODE_ENV",
-          "value": "lto"
+          "value": "production"
+        },
+        {
+          "name": "NODE_URL",
+          "value": "http://public-node:6869"
         },
         {
           "name": "STORAGE_TYPE",
           "value": "redis"
+        },
+        {
+          "name": "REDIS_URL",
+          "value": "redis://redis"
+        },
+        {
+          "name": "REDIS_GRAPH_HOST",
+          "value": "graph"
+        },
+        {
+          "name": "REDIS_GRAPH_PORT",
+          "value": "6379"
+        },
+        {
+          "name": "TRANSACTION_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "ASSOCIATION_INDEXING",
+          "value": "all"
+        },
+        {
+          "name": "IDENTITY_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "ANCHOR_INDEXING",
+          "value": "all"
+        },
+        {
+          "name": "STATS_INDEXING",
+          "value": "true"
         }
       ],
-      "links": [
-        "public-node",
-        "redis"
-      ]
+      "links": ["public-node", "redis"]
     },
     {
       "name": "public-node",
-      "image": "legalthings/public-node",
+      "image": "ltonetwork/public-node",
       "essential": true,
-      "memoryReservation": 1024,
+      "memory": 1024,
       "mountPoints": [
         {
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
+        }
+      ],
+      "environment": [
+        {
+          "name": "ENABLE_REST_API",
+          "value": "true"
+        },
+        {
+          "name": "LTO_NETWORK",
+          "value": "TESTNET"
         }
       ]
     },
@@ -67,11 +107,17 @@
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memoryReservation": 384,
+      "memoryReservation": 128
+    },
+    {
+      "name": "graph",
+      "image": "redislabs/redisgraph",
+      "essential": true,
+      "memoryReservation": 128,
       "mountPoints": [
         {
-          "sourceVolume": "redis-data",
-          "containerPath": "/data"
+          "sourceVolume": "lto-redis-graph",
+          "containerPath": "/lto"
         }
       ]
     }
