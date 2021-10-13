@@ -1,10 +1,9 @@
-version: '3'
+version: "3"
 
 services:
   nginx:
     container_name: nginx
     image: ltonetwork/public-node-proxy
-    mem_limit: 256m
     ports:
       - 80:80
     depents_on:
@@ -16,21 +15,33 @@ services:
   redis:
     container_name: redis
     image: redis
-    mem_limit: 256m
     volumes:
-      - /lto/redis/data:/lto
+      - ./volumes/redis:/lto
+    ports:
+      - 6379:6379
+    networks:
+      - lto
+
+  graph:
+    container_name: graph
+    image: redislabs/redisgraph
+    volumes:
+      - ./volumes/redis-graph:/lto
+    ports:
+      - 6380:6379
     networks:
       - lto
 
   indexer:
     container_name: indexer
-    image: legalthings/indexer
-    mem_limit: 256m
+    image: ltonetwork/indexer
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
       - STORAGE_TYPE=redis
       - REDIS_URL=redis://redis
+      - REDIS_GRAPH_HOST=graph
+      - REDIS_GRAPH_PORT=6379
       - TRANSACTION_INDEXING=true
       - ASSOCIATION_INDEXING=all
       - IDENTITY_INDEXING=true
@@ -41,17 +52,19 @@ services:
     depends_on:
       - public-node
       - redis
+      - graph
     networks:
       - lto
 
   public-node:
     container_name: public-node
-    image: ltonetwork/public-node:v1.4.1
+    image: ltonetwork/public-node
     mem_limit: 1g
     volumes:
-      - /lto/data:/lto
+      - ./volumes/public-node:/lto
+    ports:
+      - 6869:6869
     environment:
-      - ENABLE_REST_API=true
       - LTO_NETWORK=TESTNET
     networks:
       - lto
@@ -59,4 +72,3 @@ services:
 networks:
   lto:
     driver: bridge
-

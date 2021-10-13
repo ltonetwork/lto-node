@@ -1,10 +1,9 @@
-version: '3'
+version: "3"
 
 services:
   nginx:
     container_name: nginx
     image: ltonetwork/public-node-proxy
-    mem_limit: 256m
     ports:
       - 80:80
     depents_on:
@@ -15,8 +14,7 @@ services:
 
   indexer:
     container_name: indexer
-    image: legalthings/indexer
-    mem_limit: 256m
+    image: ltonetwork/indexer
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
@@ -27,19 +25,20 @@ services:
       - STATS_INDEXING=true
     ports:
       - 80:80
-    depends_on:
-      - public-node
     networks:
       - lto
+    depends_on:
+      - public-node
 
   public-node:
     container_name: public-node
     image: ltonetwork/public-node
     mem_limit: 1g
     volumes:
-      - /lto/data:/lto
+      - ./volumes/public-node:/lto
+    ports:
+      - 6869:6869
     environment:
-      - ENABLE_REST_API=true
       - LTO_NETWORK=TESTNET
     networks:
       - lto
@@ -47,4 +46,3 @@ services:
 networks:
   lto:
     driver: bridge
-

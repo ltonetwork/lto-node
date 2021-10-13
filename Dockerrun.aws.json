@@ -13,7 +13,7 @@
       "name": "nginx",
       "image": "ltonetwork/public-node-proxy",
       "essential": true,
-      "memory": 256,
+      "memoryReservation": 128,
       "portMappings": [
         {
           "hostPort": 80,
@@ -26,7 +26,7 @@
       "name": "indexer",
       "image": "ltonetwork/indexer",
       "essential": true,
-      "memory": 256,
+      "memoryReservation": 128,
       "environment": [
         {
           "name": "NODE_ENV",
@@ -61,7 +61,7 @@
     },
     {
       "name": "public-node",
-      "image": "ltonetwork/public-node:v1.4.1",
+      "image": "ltonetwork/public-node",
       "essential": true,
       "memory": 1024,
       "portMappings": [

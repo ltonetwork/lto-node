@@ -19,7 +19,7 @@
       "name": "nginx",
       "image": "legalthings/public-node-proxy",
       "essential": true,
-      "memory": 256,
+      "memoryReservation": 128,
       "portMappings": [
         {
           "hostPort": 80,
@@ -30,9 +30,9 @@
     },
     {
       "name": "indexer",
-      "image": "legalthings/indexer",
+      "image": "ltonetwork/indexer",
       "essential": true,
-      "memory": 256,
+      "memoryReservation": 128,
       "environment": [
         {
           "name": "NODE_ENV",
@@ -49,6 +49,14 @@
         {
           "name": "REDIS_URL",
           "value": "redis://redis"
+        },
+        {
+          "name": "REDIS_GRAPH_HOST",
+          "value": "graph"
+        },
+        {
+          "name": "REDIS_GRAPH_PORT",
+          "value": "6379"
         },
         {
           "name": "TRANSACTION_INDEXING",
@@ -75,7 +83,7 @@
     },
     {
       "name": "public-node",
-      "image": "ltonetwork/public-node:v1.4.1",
+      "image": "ltonetwork/public-node",
       "essential": true,
       "memory": 1024,
       "mountPoints": [
@@ -99,11 +107,17 @@
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memory": 512,
+      "memoryReservation": 128
+    },
+    {
+      "name": "graph",
+      "image": "redislabs/redisgraph",
+      "essential": true,
+      "memoryReservation": 128,
       "mountPoints": [
         {
-          "sourceVolume": "redis-data",
-          "containerPath": "/data"
+          "sourceVolume": "lto-redis-graph",
+          "containerPath": "/lto"
         }
       ]
     }

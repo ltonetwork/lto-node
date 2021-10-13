@@ -1,3 +1,4 @@
+volumes
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
