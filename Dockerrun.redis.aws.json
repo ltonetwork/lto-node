@@ -6,43 +6,9 @@
       "host": {
         "sourcePath": "/lto/data"
       }
-    },
-    {
-      "name": "redis-data",
-      "host": {
-        "sourcePath": "/lto/redis/data"
-      }
     }
   ],
   "containerDefinitions": [
-    {
-      "name": "indexer",
-      "image": "ltonetwork/indexer",
-      "essential": true,
-      "environment": [
-        {
-          "name": "STORAGE_TYPE",
-          "value": "redis"
-        }
-      ],
-      "memoryReservation": 128,
-      "portMappings": [
-        {
-          "hostPort": 80,
-          "containerPort": 80
-        }
-      ],
-      "environment": [
-        {
-          "name": "NODE_ENV",
-          "value": "lto"
-        }
-      ],
-      "links": [
-        "public-node",
-        "redis"
-      ]
-    },
     {
       "name": "public-node",
       "image": "ltonetwork/public-node",
@@ -53,11 +19,57 @@
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
         }
-      ],
+      ]
+    },
+    {
+      "name": "indexer",
+      "image": "ltonetwork/indexer",
+      "essential": true,
+      "memoryReservation": 128,
       "environment": [
         {
-          "name": "ENABLE_REST_API",
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "NODE_URL",
+          "value": "http://public-node:6869"
+        },
+        {
+          "name": "STORAGE_TYPE",
+          "value": "redis"
+        },
+        {
+          "name": "REDIS_URL",
+          "value": "redis://redis"
+        },
+        {
+          "name": "REDIS_GRAPH_HOST",
+          "value": "graph"
+        },
+        {
+          "name": "REDIS_GRAPH_PORT",
+          "value": "6379"
+        },
+        {
+          "name": "TRANSACTION_INDEXING",
           "value": "true"
+        },
+        {
+          "name": "ASSOCIATION_INDEXING",
+          "value": "all"
+        },
+        {
+          "name": "IDENTITY_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "TRUST_NETWORK_INDEXING",
+          "value": "true"
+        },
+        {
+          "name": "TRUST_NETWORK_ROLES",
+          "value": "{\"root\": {\"description\": \"The root role\",\"issues\": [{ \"type\": 100, \"role\": \"university\" }]},\"university\": {\"description\": \"University\"}}"
         }
       ]
     },
@@ -65,11 +77,17 @@
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memoryReservation": 384,
+      "memoryReservation": 128
+    },
+    {
+      "name": "graph",
+      "image": "redislabs/redisgraph",
+      "essential": true,
+      "memoryReservation": 128,
       "mountPoints": [
         {
-          "sourceVolume": "redis-data",
-          "containerPath": "/data"
+          "sourceVolume": "lto-redis-graph",
+          "containerPath": "/lto"
         }
       ]
     }

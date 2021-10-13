@@ -1,12 +1,30 @@
 version: '3'
 
 services:
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node
+    mem_limit: 1g
+    volumes:
+      - ./volumes/public-node:/lto
+    ports:
+      - 6869:6869
+    environment:
+      - LTO_NETWORK=TESTNET
+    networks:
+      - lto
+
   indexer:
     container_name: indexer
     image: ltonetwork/indexer
     environment:
-      - LTO_API_KEY=test
-      - NODE_ENV=lto
+      - NODE_ENV=production
+      - NODE_URL=http://public-node:6869
+      - TRANSACTION_INDEXING=true
+      - ASSOCIATION_INDEXING=all
+      - IDENTITY_INDEXING=true
+      - TRUST_NETWORK_INDEXING=true
+      - 'TRUST_NETWORK_ROLES={"root": {"description": "The root role","issues": [{ "type": 100, "role": "university" }]},"university": {"description": "University"}}'
     ports:
       - 80:80
     networks:
@@ -14,18 +32,6 @@ services:
     depends_on:
       - public-node
 
-  public-node:
-    container_name: public-node
-    image: ltonetwork/public-node
-    environment:
-      - ENABLE_REST_API=true
-      - LTO_WALLET_SEED=<seed of your wallet>
-      - LTO_WALLET_PASSWORD=<a password for your wallet>
-      - LTO_API_KEY=test
-    networks:
-      - lto
-
 networks:
   lto:
     driver: bridge
-
