@@ -56,14 +56,6 @@
           "value": "redis://redis"
         },
         {
-          "name": "REDIS_GRAPH_HOST",
-          "value": "graph"
-        },
-        {
-          "name": "REDIS_GRAPH_PORT",
-          "value": "6379"
-        },
-        {
           "name": "TRANSACTION_INDEXING",
           "value": "true"
         },
@@ -78,18 +70,6 @@
       "image": "redis",
       "essential": true,
       "memoryReservation": 128
-    },
-    {
-      "name": "graph",
-      "image": "redislabs/redisgraph",
-      "essential": true,
-      "memoryReservation": 128,
-      "mountPoints": [
-        {
-          "sourceVolume": "lto-redis-graph",
-          "containerPath": "/lto"
-        }
-      ]
     }
   ]
 }
