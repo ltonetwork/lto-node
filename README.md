@@ -19,23 +19,6 @@ Node Type             |Description
 
 The configuration can be done via the `./docker-compose.yml` file.
 
-##### Volumes
-
-By default, the volumes for the containers are each mounted under `./volumes/`. You can change this for each service to mount to a different folder on your device. Example:
-
-```yml
-  public-node:
-    container_name: public-node
-    image: ltonetwork/public-node
-    mem_limit: 1g
-    volumes:
-      - /<YOUR-FOLDER-HERE>/public-node:/lto
-    environment:
-      - LTO_NETWORK=TESTNET
-    networks:
-      - lto
-```
-
 ##### Required fields
 
 There are different required fields, they are mentioned per service:
@@ -52,7 +35,15 @@ There are different required fields, they are mentioned per service:
 
 | variable name          | description                                                                                     | format                 | extra information                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
-| `NODE_API_KEY`         | API key to protect restricted functions (random secret)                                         | string                 | Make sure to match the same value as the *Public Node* configuration          |
+| `ASSOCIATION_INDEXING`   | Indexing of association transactions                     | `none`, `trust`, `all`                  | `"none"`                                    |                                                                                                                                          |
+| `ANCHOR_INDEXING`        | Indexing of anchor transactions                          | `none`, `trust`, `all`                  | `"none"`                                    |                                                                                                                                          |
+| `AUTH_TOKEN`             | Authentication token                                     | string                                  | `""`                                        |                                                                                                                                          |
+
+The indexing configurations have the values of `none`, `trust` or `all`.
+
+- `none`: no transactions will be indexed
+- `trust`: only transactions from someone in your configured trust network will be indexed (see [configuring a trust network](https://docs.ltonetwork.com/v/edge/identity-node/configuration-1/configuration))
+- `all`: all transactions will be indexed
 
 **Note**
 
@@ -60,14 +51,10 @@ The indexer is configured to run as an anchoring service, but you can customize 
 
 ##### Connecting to External Services
 
-The node configuration comes with Redis, RabbitMQ and MongoDB included. It is adviced to run these services outside of 
-the node. The following Environment properties can be used to connect to external services:
+The following environment properties can be used to connect to external services:
 
 | Service                   | Variable                      | Description                                                                         |
 | ------------------------- | ------------------------------| ----------------------------------------------------------------------------------- |
-| LegalEvents / Legalflow   | `MONGODB_URL`                 | Use the MongoDB connection string                                                   |
-| Event Dispatcher          | `DISPATCHER_RABBITMQ_CLIENT`  | Use the RabbitMQ connection string                                                  |
-| Webserver                 | `PORT`                        | Run the node on a different port                                                    |
 | Indexer                   | `REDIS_URL`                   | See the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more |
 
 ## Run on a (virtual) machine
