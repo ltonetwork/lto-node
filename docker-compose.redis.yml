@@ -25,6 +25,8 @@ services:
   indexer:
     container_name: indexer
     image: ltonetwork/indexer
+    volumes:
+      - ./volumes/indexer:/usr/data/lto-index
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
