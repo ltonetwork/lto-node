@@ -1,10 +1,10 @@
-version: '3'
+version: "2.4"
 
 services:
   public-node:
     container_name: public-node
     image: ltonetwork/public-node
-    mem_limit: 1g
+    mem_reservation: 1g
     volumes:
       - ./volumes/public-node:/lto
     ports:
