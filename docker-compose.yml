@@ -20,7 +20,7 @@ services:
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
-      - TRANSACTION_INDEXING=true
+      - ASSOCIATION_INDEXING=true
       - ANCHOR_INDEXING=all
     ports:
       - 80:80

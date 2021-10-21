@@ -48,7 +48,7 @@
           "value": "http://public-node:6869"
         },
         {
-          "name": "TRANSACTION_INDEXING",
+          "name": "ASSOCIATION_INDEXING",
           "value": "true"
         },
         {
