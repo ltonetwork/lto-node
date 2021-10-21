@@ -6,7 +6,7 @@ services:
     image: ltonetwork/public-node-proxy
     ports:
       - 80:80
-    depents_on:
+    depends_on:
       - indexer
       - public-node
     networks:
