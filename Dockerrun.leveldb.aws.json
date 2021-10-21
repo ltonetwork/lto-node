@@ -6,6 +6,12 @@
       "host": {
         "sourcePath": "/lto/data"
       }
+    },
+    {
+      "name": "lto-index",
+      "host": {
+        "sourcePath": "/lto/index"
+      }
     }
   ],
   "containerDefinitions": [
@@ -32,6 +38,12 @@
       "image": "ltonetwork/indexer",
       "essential": true,
       "memoryReservation": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-index",
+          "containerPath": "/usr/app/lto-index"
+        }
+      ],
       "portMappings": [
         {
           "hostPort": 80,
