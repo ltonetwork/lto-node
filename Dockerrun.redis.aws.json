@@ -57,7 +57,7 @@
         },
         {
           "name": "ASSOCIATION_INDEXING",
-          "value": "true"
+          "value": "all"
         },
         {
           "name": "ANCHOR_INDEXING",
