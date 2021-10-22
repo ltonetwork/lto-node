@@ -31,6 +31,16 @@
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
         }
+      ],
+      "environment": [
+        {
+          "name": "LTO_NETWORK",
+          "value": "MAINNET"
+        },
+        {
+          "name": "ENABLE_REST_API",
+          "value": "true"
+        }
       ]
     },
     {

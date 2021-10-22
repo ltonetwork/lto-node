@@ -10,7 +10,8 @@ services:
     ports:
       - 6869:6869
     environment:
-      - LTO_NETWORK=TESTNET
+      - LTO_NETWORK=MAINNET
+      - ENABLE_REST_API=true
     networks:
       - lto
 

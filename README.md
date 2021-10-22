@@ -28,15 +28,16 @@ There are different required fields, they are mentioned per service:
 | variable name          | description                                                                                     | format                 | extra information                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
 | `LTO_API_KEY`          | API key to protect restricted functions (random secret)                                         | string                 | This can be any string                                                        |
-| `LTO_NETWORK`          | Which network to attach the node to                                                             | `MAINNET`, `TESTNET`   | Default is set to `TESTNET`                                                   |
+| `LTO_NETWORK`          | Which network to attach the node to                                                             | `MAINNET`, `TESTNET`   | Default is set to `MAINNET`                                                   |
 | `LTO_WALLET_SEED`      | The seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions. | string                 | Can also be set as `LTO_WALLET_SEED_BASE58`, which will take a `base58` value |
+| `LTO_NODE_NAME`        | Node name used in the handshake when connecting to other nodes                                  | string                 |
 
 *Indexer*
 
 | variable name          | description                                                                                     | format                 | extra information                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
-| `ASSOCIATION_INDEXING`   | Indexing of association transactions                     | `none`, `trust`, `all`                  | `"none"`                                    |                                                                                                                                          |
-| `ANCHOR_INDEXING`        | Indexing of anchor transactions                          | `none`, `trust`, `all`                  | `"none"`                                    |                                                                                                                                          |
+| `ASSOCIATION_INDEXING`   | Indexing of association transactions                     | `none`, `trust`, `all`                  | `"all"`                                    |                                                                                                                                          |
+| `ANCHOR_INDEXING`        | Indexing of anchor transactions                          | `none`, `trust`, `all`                  | `"all"`                                    |                                                                                                                                          |
 | `AUTH_TOKEN`             | Authentication token                                     | string                                  | `""`                                        |                                                                                                                                          |
 
 The indexing configurations have the values of `none`, `trust` or `all`.
