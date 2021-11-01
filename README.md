@@ -36,10 +36,10 @@ There are different required fields, they are mentioned per service:
 
 | variable name          | description                                                                                     | format                 | extra information                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
-| `ASSOCIATION_INDEXING`   | Indexing of association transactions                     | `none`, `trust`, `all`                  | `"all"`                                    |                                                                                                                                          |
-| `ANCHOR_INDEXING`        | Indexing of anchor transactions                          | `none`, `trust`, `all`                  | `"all"`                                    |                                                                                                                                          |
-| `AUTH_TOKEN`             | Authentication token                                     | string                                  | `""`                                        |                                                                                                                                          |
-| `NODE_API_KEY`           | Node API key	                                          | string                                  | `""`                                        | Same value as `LTO_API_KEY` of the public node                                                                                           |
+| `ASSOCIATION_INDEXING`   | Indexing of association transactions                     | `none`, `trust`, `all`                  |         |
+| `ANCHOR_INDEXING`        | Indexing of anchor transactions                          | `none`, `trust`, `all`                  |         |
+| `AUTH_TOKEN`             | Authentication token                                     | string                                  |         |
+| `NODE_API_KEY`           | Node API key	                                          | string                                  | Same value as `LTO_API_KEY` of the public node |                                                                                            |
 
 The indexing configurations have the values of `none`, `trust` or `all`.
 
