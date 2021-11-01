@@ -128,3 +128,14 @@ The wallet can be found here: [https://wallet.lto.network](https://wallet.lto.ne
  
 The explorer can be found here: [https://explorer.lto.network](https://explorer.lto.network)
 
+## Manual update from v1.3
+
+### Public node
+
+For the public node the docker image has changed from `legalthings/public-node` to [`ltonetwork/public-node`](https://hub.docker.com/repository/docker/ltonetwork/public-node).
+
+### Anchor / Indexer
+
+The anchor service has been replaced by the indexer service. Use docker image [`ltonetwork/indexer`](https://hub.docker.com/repository/docker/ltonetwork/indexer).
+
+The indexer can't use the data collected by the anchor service. It will index from genesis. The old data may be deleted.
