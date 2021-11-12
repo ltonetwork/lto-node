@@ -85,6 +85,10 @@
           "name": "ANCHOR_INDEXING",
           "value": "all"
         }
+      ],
+      "links": [
+        "public-node",
+        "redis"
       ]
     },
     {
