@@ -6,17 +6,20 @@ services:
     image: ltonetwork/public-node
     mem_reservation: 1g
     volumes:
-      - ./volumes/public-node:/lto
+      - lto-data:/lto
     ports:
       - 6869:6869
     environment:
-      - LTO_NETWORK=TESTNET
+      - LTO_NETWORK=MAINNET
+      - ENABLE_REST_API=true
     networks:
       - lto
 
   indexer:
     container_name: indexer
     image: ltonetwork/indexer
+    volumes:
+      - lto-index:/usr/data/lto-index
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
@@ -31,6 +34,10 @@ services:
       - lto
     depends_on:
       - public-node
+
+volumes:
+  lto-data:
+  lto-index:
 
 networks:
   lto:

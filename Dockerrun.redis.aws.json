@@ -6,6 +6,24 @@
       "host": {
         "sourcePath": "/lto/data"
       }
+    },
+    {
+      "name": "lto-redis",
+      "host": {
+        "sourcePath": "/lto/redis"
+      }
+    },
+    {
+      "name": "lto-graph",
+      "host": {
+        "sourcePath": "/lto/graph"
+      }
+    },
+    {
+      "name": "lto-index",
+      "host": {
+        "sourcePath": "/lto/index"
+      }
     }
   ],
   "containerDefinitions": [
@@ -14,10 +32,26 @@
       "image": "ltonetwork/public-node",
       "essential": true,
       "memoryReservation": 1024,
+      "portMappings": [
+        {
+          "hostPort": 6869,
+          "containerPort": 6869
+        }
+      ],
       "mountPoints": [
         {
           "sourceVolume": "lto-data",
           "containerPath": "/lto/data"
+        }
+      ],
+      "environment": [
+        {
+          "name": "LTO_NETWORK",
+          "value": "MAINNET"
+        },
+        {
+          "name": "ENABLE_REST_API",
+          "value": "true"
         }
       ]
     },
@@ -26,6 +60,18 @@
       "image": "ltonetwork/indexer",
       "essential": true,
       "memoryReservation": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-index",
+          "containerPath": "/usr/app/lto-index"
+        }
+      ],
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
       "environment": [
         {
           "name": "NODE_ENV",
@@ -77,7 +123,13 @@
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memoryReservation": 128
+      "memoryReservation": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-redis",
+          "containerPath": "/data"
+        }
+      ]
     },
     {
       "name": "graph",
@@ -86,8 +138,8 @@
       "memoryReservation": 128,
       "mountPoints": [
         {
-          "sourceVolume": "lto-redis-graph",
-          "containerPath": "/lto"
+          "sourceVolume": "lto-graph",
+          "containerPath": "/data"
         }
       ]
     }
