@@ -19,7 +19,7 @@ services:
     container_name: redis
     image: redis
     volumes:
-      - ./volumes/redis:/lto
+      - lto-redis:/lto
     networks:
       - lto
 
@@ -44,6 +44,7 @@ services:
 
 volumes:
   lto-data:
+  lto-redis:
   lto-index:
 
 networks:

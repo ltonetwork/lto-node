@@ -8,6 +8,12 @@
       }
     },
     {
+      "name": "lto-redis",
+      "host": {
+        "sourcePath": "/lto/redis"
+      }
+    },
+    {
       "name": "lto-index",
       "host": {
         "sourcePath": "/lto/index"
@@ -86,16 +92,19 @@
           "value": "all"
         }
       ],
-      "links": [
-        "public-node",
-        "redis"
-      ]
+      "links": ["public-node", "redis"]
     },
     {
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memoryReservation": 128
+      "memoryReservation": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-redis",
+          "containerPath": "/data"
+        }
+      ]
     }
   ]
 }
