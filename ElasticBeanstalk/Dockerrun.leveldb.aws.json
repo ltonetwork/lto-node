@@ -35,7 +35,7 @@
       "environment": [
         {
           "name": "LTO_NETWORK",
-          "value": "MAINNET"
+          "value": "TESTNET"
         },
         {
           "name": "ENABLE_REST_API",
@@ -78,9 +78,7 @@
           "value": "all"
         }
       ],
-      "links": [
-        "public-node"
-      ]
+      "links": ["public-node"]
     }
   ]
 }

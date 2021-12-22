@@ -4,13 +4,12 @@ services:
   public-node:
     container_name: public-node
     image: ltonetwork/public-node
-    mem_reservation: 1g
     volumes:
       - lto-data:/lto
     ports:
       - 6869:6869
     environment:
-      - LTO_NETWORK=MAINNET
+      - LTO_NETWORK=TESTNET
       - ENABLE_REST_API=true
     networks:
       - lto
