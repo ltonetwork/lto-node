@@ -19,22 +19,6 @@ There are 4 configuration variations of the node. Each configuration serves a di
 
 The configuration can be done via the `./docker-compose.yml` file.
 
-### Volumes
-
-By default, the volumes for the containers are each mounted under `./volumes/`. You can change this for each service to mount to a different folder on your device. Example:
-
-```yml
-public-node:
-  container_name: public-node
-  image: ltonetwork/public-node
-  volumes:
-    - /<YOUR-FOLDER-HERE>/public-node:/lto
-  environment:
-    - LTO_NETWORK=TESTNET
-  networks:
-    - lto
-```
-
 ### Required fields
 
 There are different required fields, they are mentioned per service:
@@ -88,7 +72,7 @@ the node. The following Environment properties can be used to connect to externa
 docker-compose up
 ```
 
-Docker compose is configured to run the node on a local machine on port 80. If you would like to run the node on different
+Docker compose is configured to run the indexer on a local machine on port 80. If you would like to run it on different
 port you will need to change the `docker-compose.yml` to
 
 ```
@@ -98,7 +82,7 @@ ports:
 
 This way the node will be accessible via port 80.
 
-Or you can use a reverse proxy like NGINX to make the node publicly available. This is highly recommended.
+Or you can use a reverse proxy like NGINX to both the node and indexer run off the same port or publicly available. This is highly recommended.
 
 ## Run in AWS Elastic Beanstalk
 
@@ -129,7 +113,7 @@ Take the following steps to install the node on EB:
    - Name: `LTO_WALLET_SEED` or `LTO_WALLET_SEED_BASE58`, Value: `Wallet Seed`
    - Name: `PUBLIC_HOSTNAME`, Value: `The hostname where the node is reachable. (This can be EB generated address)`
 
-Now your node is should good to go!
+Now your node should be good to go!
 
 ## Documentation
 
@@ -141,7 +125,7 @@ You can find the API documentation on the url where your node is deployed.
 
 If you wish to start testing with our testnet. Please create a wallet on: [https://testnet-wallet.lto.network](https://testnet-wallet.lto.network)
 
-Send you address to our [support](mailto:support@ltonetwork.io) so we will deposit some LTO for testing on the testnet. Or request your tokens via our [telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
+Send your address to our [support](mailto:support@ltonetwork.io) so we will deposit some LTO for testing on the testnet. Or request your tokens via our [telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
 
 To view all the transactions on the testnet you can check out our explorer on: [https://testnet-explorer.lto.network](https://testnet-explorer.lto.network)
 
