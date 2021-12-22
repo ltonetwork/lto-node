@@ -39,12 +39,6 @@
           "containerPath": "/usr/app/lto-index"
         }
       ],
-      "portMappings": [
-        {
-          "hostPort": 80,
-          "containerPort": 80
-        }
-      ],
       "environment": [
         {
           "name": "NODE_ENV",
@@ -82,12 +76,6 @@
       "image": "ltonetwork/public-node",
       "essential": true,
       "memoryReservation": 1024,
-      "portMappings": [
-        {
-          "hostPort": 6869,
-          "containerPort": 6869
-        }
-      ],
       "mountPoints": [
         {
           "sourceVolume": "lto-data",

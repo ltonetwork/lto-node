@@ -18,8 +18,6 @@ services:
     mem_reservation: 1g
     volumes:
       - lto-data:/lto
-    ports:
-      - 6869:6869
     environment:
       - LTO_NETWORK=MAINNET
       - ENABLE_REST_API=true
@@ -39,8 +37,6 @@ services:
       - IDENTITY_INDEXING=true
       - ANCHOR_INDEXING=all
       - STATS_INDEXING=true
-    ports:
-      - 80:80
     depends_on:
       - public-node
     networks:
