@@ -8,9 +8,21 @@
       }
     },
     {
-      "name": "redis-data",
+      "name": "lto-redis",
       "host": {
-        "sourcePath": "/lto/redis/data"
+        "sourcePath": "/lto/redis"
+      }
+    },
+    {
+      "name": "lto-graph",
+      "host": {
+        "sourcePath": "/lto/graph"
+      }
+    },
+    {
+      "name": "lto-index",
+      "host": {
+        "sourcePath": "/lto/index"
       }
     }
   ],
@@ -26,13 +38,25 @@
           "containerPort": 80
         }
       ],
-      "links": ["anchor", "public-node"]
+      "links": ["indexer", "public-node"]
     },
     {
       "name": "indexer",
       "image": "ltonetwork/indexer",
       "essential": true,
       "memoryReservation": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-index",
+          "containerPath": "/usr/app/lto-index"
+        }
+      ],
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
       "environment": [
         {
           "name": "NODE_ENV",
@@ -79,13 +103,19 @@
           "value": "true"
         }
       ],
-      "links": ["public-node", "redis"]
+      "links": ["public-node", "redis", "graph"]
     },
     {
       "name": "public-node",
       "image": "ltonetwork/public-node",
       "essential": true,
-      "memory": 1024,
+      "memoryReservation": 1024,
+      "portMappings": [
+        {
+          "hostPort": 6869,
+          "containerPort": 6869
+        }
+      ],
       "mountPoints": [
         {
           "sourceVolume": "lto-data",
@@ -94,12 +124,12 @@
       ],
       "environment": [
         {
-          "name": "ENABLE_REST_API",
-          "value": "true"
+          "name": "LTO_NETWORK",
+          "value": "MAINNET"
         },
         {
-          "name": "LTO_NETWORK",
-          "value": "TESTNET"
+          "name": "ENABLE_REST_API",
+          "value": "true"
         }
       ]
     },
@@ -107,7 +137,13 @@
       "name": "redis",
       "image": "redis",
       "essential": true,
-      "memoryReservation": 128
+      "memoryReservation": 128,
+      "mountPoints": [
+        {
+          "sourceVolume": "lto-redis",
+          "containerPath": "/data"
+        }
+      ]
     },
     {
       "name": "graph",
@@ -116,8 +152,8 @@
       "memoryReservation": 128,
       "mountPoints": [
         {
-          "sourceVolume": "lto-redis-graph",
-          "containerPath": "/lto"
+          "sourceVolume": "lto-graph",
+          "containerPath": "/data"
         }
       ]
     }

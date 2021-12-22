@@ -17,7 +17,7 @@
   "containerDefinitions": [
     {
       "name": "nginx",
-      "image": "ltonetwork/public-node-proxy",
+      "image": "legalthings/public-node-proxy",
       "essential": true,
       "memoryReservation": 128,
       "portMappings": [
@@ -37,6 +37,12 @@
         {
           "sourceVolume": "lto-index",
           "containerPath": "/usr/app/lto-index"
+        }
+      ],
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
         }
       ],
       "environment": [
@@ -75,7 +81,7 @@
       "name": "public-node",
       "image": "ltonetwork/public-node",
       "essential": true,
-      "memory": 1024,
+      "memoryReservation": 1024,
       "portMappings": [
         {
           "hostPort": 6869,
@@ -90,12 +96,12 @@
       ],
       "environment": [
         {
-          "name": "ENABLE_REST_API",
-          "value": "true"
+          "name": "LTO_NETWORK",
+          "value": "MAINNET"
         },
         {
-          "name": "LTO_NETWORK",
-          "value": "TESTNET"
+          "name": "ENABLE_REST_API",
+          "value": "true"
         }
       ]
     }

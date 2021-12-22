@@ -6,7 +6,7 @@ services:
     image: ltonetwork/public-node-proxy
     ports:
       - 80:80
-    depents_on:
+    depends_on:
       - indexer
       - public-node
     networks:
@@ -16,7 +16,7 @@ services:
     container_name: redis
     image: redis
     volumes:
-      - ./volumes/redis:/lto
+      - lto-redis:/lto
     ports:
       - 6379:6379
     networks:
@@ -26,15 +26,31 @@ services:
     container_name: graph
     image: redislabs/redisgraph
     volumes:
-      - ./volumes/redis-graph:/lto
+      - lto-graph:/lto
     ports:
       - 6380:6379
+    networks:
+      - lto
+
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node
+    mem_reservation: 1g
+    volumes:
+      - lto-data:/lto
+    ports:
+      - 6869:6869
+    environment:
+      - LTO_NETWORK=MAINNET
+      - ENABLE_REST_API=true
     networks:
       - lto
 
   indexer:
     container_name: indexer
     image: ltonetwork/indexer
+    volumes:
+      - lto-index:/usr/data/lto-index
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
@@ -56,18 +72,11 @@ services:
     networks:
       - lto
 
-  public-node:
-    container_name: public-node
-    image: ltonetwork/public-node
-    mem_reservation: 1g
-    volumes:
-      - ./volumes/public-node:/lto
-    ports:
-      - 6869:6869
-    environment:
-      - LTO_NETWORK=TESTNET
-    networks:
-      - lto
+volumes:
+  lto-data:
+  lto-redis:
+  lto-graph:
+  lto-index:
 
 networks:
   lto:
