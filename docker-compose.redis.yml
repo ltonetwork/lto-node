@@ -32,8 +32,7 @@ services:
       - NODE_URL=http://public-node:6869
       - STORAGE_TYPE=redis
       - REDIS_URL=redis://redis
-      - ASSOCIATION_INDEXING=all
-      - ANCHOR_INDEXING=all
+      - ANCHOR_INDEXING=trust
     ports:
       - 80:80
     networks:

@@ -44,8 +44,10 @@ There are different required fields, they are mentioned per service:
 The indexing configurations have the values of `none`, `trust` or `all`.
 
 - `none`: no transactions will be indexed
-- `trust`: only transactions from someone in your configured trust network will be indexed (see [configuring a trust network](https://docs.ltonetwork.com/v/edge/identity-node/configuration-1/configuration))
+- `trust`: only transactions from your node, or someone in your configured trust network will be indexed (see [configuring a trust network](https://docs.ltonetwork.com/v/edge/identity-node/configuration-1/configuration))
 - `all`: all transactions will be indexed
+
+By default, the anchor node will only index anchor transactions of your own node.
 
 **Note**
 

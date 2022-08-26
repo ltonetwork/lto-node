@@ -70,12 +70,8 @@
           "value": "http://public-node:6869"
         },
         {
-          "name": "ASSOCIATION_INDEXING",
-          "value": "all"
-        },
-        {
           "name": "ANCHOR_INDEXING",
-          "value": "all"
+          "value": "trust"
         }
       ],
       "links": ["public-node"]

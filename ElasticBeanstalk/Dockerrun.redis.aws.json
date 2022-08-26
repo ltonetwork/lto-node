@@ -84,12 +84,8 @@
           "value": "redis://redis"
         },
         {
-          "name": "ASSOCIATION_INDEXING",
-          "value": "all"
-        },
-        {
           "name": "ANCHOR_INDEXING",
-          "value": "all"
+          "value": "trust"
         }
       ],
       "links": ["public-node", "redis"]
