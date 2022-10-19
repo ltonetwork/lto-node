@@ -13,7 +13,7 @@ Node Type             |Description
 [Anchor Node]: https://github.com/ltonetwork/lto-anchor-node
 [Identity Node]: https://github.com/ltonetwork/lto-identity-node
 
-# LTO Network Full Node
+# LTO Network Workflow Node
 
 A Full Node can be setup using different orchestration tools.
 
