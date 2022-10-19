@@ -7,11 +7,11 @@ Node Type             |Description
 **Public Node only**  |Contains only the public node. This configuration can be used for mining 
 [Anchor Node]         |Contains both the public node and the indexer. The indexer is configured for the anchoring of hashes
 [Identity Node]       |Contains both the public node and the indexer. The indexer is configured for DID documents and trust networks
-[Full Node]           |Contains all services. This configuration can used to run decentralized workflows
+[Workflow Node]       |All services required to run decentralized workflows
 
 [Anchor Node]: https://github.com/ltonetwork/lto-anchor-node
 [Identity Node]: https://github.com/ltonetwork/lto-identity-node
-[Full Node]: https://github.com/ltonetwork/lto-full-node
+[Workflow Node]: https://github.com/ltonetwork/lto-workflow-node
 
 # LTO Network Public Node
 
