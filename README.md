@@ -1,4 +1,4 @@
-![LTO Network](https://user-images.githubusercontent.com/100821/108692834-6a115200-74fd-11eb-92df-ee07bf62b386.png)
+![LTO github readme](https://user-images.githubusercontent.com/100821/196711741-96cd4ba5-932a-4e95-b420-42d4d61c21fd.png)
 
 There are 4 configuration variations of the node. Each configuration serves a different need of the node:
 
