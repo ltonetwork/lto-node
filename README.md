@@ -56,14 +56,10 @@ You can read more about the trust network [here](https://docs.ltonetwork.com/v/e
 
 ### Connecting to External Services
 
-The node configuration comes with Redis, RabbitMQ and MongoDB included. It is adviced to run these services outside of
-the node. The following Environment properties can be used to connect to external services:
+The docker configuration comes with Redis included. It is adviced to run these services outside of the node. The following Environment properties can be used to connect to external services:
 
 | Service                 | Variable                     | Description                                                                         |
 | ----------------------- | ---------------------------- | ----------------------------------------------------------------------------------- |
-| LegalEvents / Legalflow | `MONGODB_URL`                | Use the MongoDB connection string                                                   |
-| Event Dispatcher        | `DISPATCHER_RABBITMQ_CLIENT` | Use the RabbitMQ connection string                                                  |
-| Webserver               | `PORT`                       | Run the node on a different port                                                    |
 | Indexer                 | `REDIS_URL`                  | See the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more |
 
 ## Run on a (virtual) machine
