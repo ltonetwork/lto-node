@@ -7,11 +7,11 @@ There are 4 configuration variations of the node. Each configuration serves a di
 | [Public Node only] | Contains only the public node. This configuration can be used for mining                                      |
 | [Anchor Node]      | Contains both the public node and the indexer. The indexer is configured for the anchoring of hashes          |
 | **Identity Node**  | Contains both the public node and the indexer. The indexer is configured for DID documents and trust networks |
-| [Full Node]        | Contains all services. This configuration can used to run decentralized workflows                             |
+| [Workflow Node]    | All services required to run decentralized workflows
 
 [public node only]: https://github.com/ltonetwork/lto-public-node
 [anchor node]: https://github.com/ltonetwork/lto-anchor-node
-[full node]: https://github.com/ltonetwork/lto-full-node
+[Workflow Node]: https://github.com/ltonetwork/lto-workflow-node
 
 # LTO Network Identity Node
 
