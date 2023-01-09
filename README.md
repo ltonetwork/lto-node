@@ -1,4 +1,4 @@
-![github-banner](https://user-images.githubusercontent.com/100821/108692834-6a115200-74fd-11eb-92df-ee07bf62b386.png)
+![LTO github readme](https://user-images.githubusercontent.com/100821/211341590-36d70b2c-2d80-4759-ab40-727f8c3c3091.png)
 
 # Public Index Node
 
