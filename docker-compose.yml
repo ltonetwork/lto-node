@@ -10,12 +10,7 @@ services:
     ports:
       - 6863:6863
       - 6868:6868
-      - 6869:6869
     environment:
-      - LTO_NETWORK=TESTNET
-    networks:
-      - lto
-
-networks:
-  lto:
-    driver: bridge
+      - LTO_WALLET_SEED=
+      - LTO_NETWORK=MAINNET
+      
