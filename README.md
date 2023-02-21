@@ -79,7 +79,7 @@ Take the following steps to install the node on EB:
   - Platform: Multi-container Docker
   - Upload the zipped file
 5. Configure more options
-6. Instances -> Instance type: Choose an instance with atleast 2 gb of memory (E.g. t2.small)
+6. Instances -> Instance type: Choose an instance with at least 2 gb of memory (E.g. t2.small)
 7. Software -> Environment properties:
     - Name: `LTO_NETWORK`, Value: `MAINNET` or `TESTNET` - the default is `MAINNET`, but you can set it to run a node on testnet if you wish
     - Name: `LTO_API_KEY`, Value: `Any string` - this is your API key, can be any random string you wish
@@ -99,7 +99,7 @@ You can find the API documentation on the url where your node is deployed.
  
 If you wish to start testing with our testnet. Please create a wallet on: [https://testnet-wallet.lto.network](https://testnet-wallet.lto.network)
  
-Send you address to our [support](mailto:support@ltonetwork.io) so we will deposit some LTO for testing on the testnet. Or request your tokens via our [telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
+Send your address to our [support](mailto:support@ltonetwork.io) so we will deposit some LTO for testing on the testnet. Or request your tokens via our [telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
  
 To view all the transactions on the testnet you can check out our explorer on: [https://testnet-explorer.lto.network](https://testnet-explorer.lto.network)
  
