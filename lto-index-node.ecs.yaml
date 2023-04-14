@@ -1,0 +1,1399 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Creating ECS service to Run LTO Index Node
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Application
+        Parameters:
+          - AppName
+          - AppNodeTag
+          - AppIndexTag
+      - Label:
+          default: LTO Node
+        Parameters:
+          - LtoNetwork
+          - LtoWalletSeed
+          - LtoNodeName
+          - LtoFeatures
+          - LtoEnableMining
+          - LtoFullHistory
+      - Label:
+          default: Indexing
+        Parameters:
+          - LtoAssociationIndexing
+          - LtoAnchorIndexing
+          - LtoIdentiyIndexing
+          - LtoTransactionIndexing
+          - LtoStatsIndexing
+      - Label:
+          default: Instance
+        Parameters:
+          - ApplicationState
+          - HighCapacityInstanceSize
+          - LowCapacityInstanceSize
+          - ECSAMI
+          - VolumeSnapshotRetentionDays
+          - VolumeSnapshotId
+      - Label:
+          default: Network
+        Parameters:
+          - ApplicationVPC
+          - ApplicationSubnet
+          - ApplicationAZ
+      - Label:
+          default: Load Balancer
+        Parameters:
+          - ApplicationHasLoadBalancer
+          - ApplicationLoadBalancerSubnetAZ1
+          - ApplicationLoadBalancerSubnetAZ2
+          - IndexServiceCertificateARN
+      - Label: 
+          default: Database
+        Parameters:
+          - LtoIndexDBType
+          - IndexerRedisInstanceSize
+
+    ParameterLabels:
+        AppName:
+          default: Application Name
+        ApplicationState:
+          default: Application State
+        ApplicationVPC:
+          default: Application VPC
+        ApplicationSubnet:
+          default: Application Subnet  
+        ApplicationAZ:
+          default: Application Availability Zone
+        ApplicationLoadBalancerSubnetAZ1:
+          default: Application Load Balancer Public Subnet AZ1
+        ApplicationLoadBalancerSubnetAZ2:
+          default: Application Load Balancer Public Subnet AZ2
+        IndexServiceCertificateARN:
+          default: SSL Certificate ARN
+        AppNodeTag:
+          default: Public Node Docker Tag
+        AppIndexTag:
+          default: Indexer Docker Tag
+        LtoNetwork: 
+          default: LTO Network Type
+        LtoWalletSeed:
+          default: Wallet Seed Phrase
+        LtoNodeName:
+          default: Node Name
+        LtoFeatures:
+          default: Feature Voting
+        LtoEnableMining:
+          default: Enable Mining
+        LtoFullHistory:
+          default: Full History
+        LtoIndexDBType:
+          default: Indexer Database Type
+        LtoAnchorIndexing:
+          default: Index Anchor Transactions
+        LtoAssociationIndexing:
+          default: Index Association Transactions
+        LtoIdentiyIndexing:
+          default: Index Identities (DIDs)
+        LtoTransactionIndexing:
+          default: Index Transactions
+        LtoStatsIndexing:
+          default: Index Statistics
+        IndexerRedisInstanceSize:
+          default: Redis Instance Size 
+        ECSAMI:
+          default: AMI For ECS Configuration
+        HighCapacityInstanceSize: 
+          default: Instance Type For High Capacity
+        LowCapacityInstanceSize: 
+          default: Instance Type For Low Capacity
+        VolumeSnapshotRetentionDays:
+          default: Number Of Days Volume Snapshot Retained
+        VolumeSnapshotId:
+          default: Volume Snapshot ID ( Not ARN )
+
+
+
+Parameters:
+  AppName: 
+    Type: String
+    Description: Name of the Application ( resource tagging ) 
+    Default: lto-node
+  LtoNetwork: 
+    Type: String
+    Description: Which network to attach the node to
+    AllowedValues: [MAINNET, TESTNET]
+    ConstraintDescription: Please choose a valid lto network type.
+    Default: TESTNET
+  LtoWalletSeed: 
+    Type: String
+    Description: The seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions.
+  LtoNodeName:
+    Type: String
+    Description: Node name used in the handshake when connecting to other nodes
+  LtoFeatures:
+    Type: String
+    Description: Features you wish to vote for. Vote for multiple features at by comma seperating them (e.g. 4,5).
+  LtoEnableMining:
+    Type: String
+    Description: Proof of Stake mining can yield rewards for the node balance
+    AllowedValues: [true, false]
+    ConstraintDescription: Please choose a true or false
+    Default: false
+  LtoFullHistory:
+    Type: String
+    Description: Keep track of all transactions and balance history since genesis.
+    AllowedValues: [true, false]
+    ConstraintDescription: Please choose a true or false
+    Default: false
+  LtoIndexDBType:
+    Type: String
+    Description: Store index on disk with LevelDB or on AWS Elasticache with Redis
+    AllowedValues: [Redis, LevelDB]
+    Default: LevelDB
+  LtoAssociationIndexing:
+    Type: String
+    Description: Enable indexing of association txs [ 'trust' = only own assocations signed by own node ]
+    AllowedValues: ['none', 'trust', 'all']
+    Default: 'all'
+  LtoAnchorIndexing:
+    Type: String
+    Description: Enable indexing of anchor txs [ 'trust' = only own assocations signed by own node ]
+    AllowedValues: ['none', 'trust', 'all']
+    Default: 'all'
+  LtoIdentiyIndexing:
+    Type: String
+    Description: Enable indexing of DIDs
+    AllowedValues: [true, false]
+    Default: true
+  LtoTransactionIndexing:
+    Type: String
+    Description: Index all transactions
+    AllowedValues: [true, false]
+    Default: true
+  LtoStatsIndexing:
+    Type: String
+    Description: Calculate statistics based on transactions and generated blocks
+    AllowedValues: [true, false]
+    Default: true
+  IndexerRedisInstanceSize:
+    Type: String
+    AllowedValues: [cache.t3.small, cache.t3.medium,cache.t3.large,cache.r6g.large, cache.r6g.xlarge, cache.r6g.2xlarge, cache.r6g.4xlarge, cache.r6g.8xlarge, cache.r6g.12xlarge, cache.r6g.16xlarge, cache.r6g.24xlarge]
+    Description: AWS Elasticache instance size for Redis DB ( If Redis is selected as database type )
+    ConstraintDescription: Please choose an instance size
+  ECSAMI:
+    Description: AMI ID
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: /aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id
+  VolumeSnapshotRetentionDays:
+    Description: Number of Snapshot Retained. E.g. 10 - Last 10 snapshot is stored [ 0 = No Snapshot ]
+    Type: Number
+    Default: 0
+    MinValue: 0
+    MaxValue: 1000
+  VolumeSnapshotId:
+    Description: Restore volume from an existing snapshot
+    Type: String
+  HighCapacityInstanceSize:
+    Description: EC2 instance type for HIGH capacity performance
+    Type: String
+    Default: c5.xlarge
+    AllowedValues: [t3.small, t3.medium, t3.large, t3.xlarge, t3.2xlarge, c5.large, c5.xlarge, c5.2xlarge, c5.4xlarge, c5.9xlarge, c5.12xlarge, c5.18xlarge, c5.24xlarge]
+    ConstraintDescription: Please choose a valid instance type.
+  LowCapacityInstanceSize: 
+    Type: String
+    Description: EC2 instance type for LOW capacity performance 
+    AllowedValues: [t3.small, t3.medium, t3.large, t3.xlarge, t3.2xlarge, c5.large, c5.xlarge, c5.2xlarge, c5.4xlarge, c5.9xlarge, c5.12xlarge, c5.18xlarge, c5.24xlarge]
+    Default: t3.medium
+    ConstraintDescription: Please choose a valid instance type.
+  ApplicationState:
+    Type: String
+    Description: High Capacity or Low Capacity state
+    AllowedValues: [high, low]
+    ConstraintDescription: Please choose a valid application state
+    Default: high
+  ApplicationVPC:
+    Type: AWS::EC2::VPC::Id
+  ApplicationSubnet:
+    Type: AWS::EC2::Subnet::Id
+  ApplicationAZ:
+    Type: AWS::EC2::AvailabilityZone::Name
+  ApplicationLoadBalancerSubnetAZ1:
+    Type: AWS::EC2::Subnet::Id
+  ApplicationLoadBalancerSubnetAZ2:
+    Type: AWS::EC2::Subnet::Id
+  IndexServiceCertificateARN:
+    Type: String
+    Description: ALB Certificate ARN
+    Default: ""
+  AppNodeTag:
+    Type: String
+    Description: Public node version number (eg v1.7) or tag (latest, edge or nightly)
+    Default: latest
+  AppIndexTag:
+    Type: String
+    Description: Indexer version number (eg v1.3)  or tag (latest, edge or nightly)
+    Default: latest
+
+Conditions:
+  AllowHighCapacityInstanceSize: !Equals [ !Ref ApplicationState, high ]
+  LtoApiEnabledFlag: !Equals  [ true , true ]
+  LtoEnabledRedisFlag: !Equals [ !Ref LtoIndexDBType , 'Redis' ]
+  IsIndexServiceHTTPSEnabled:  !Not [ !Equals [!Ref "IndexServiceCertificateARN", ""] ]
+  IsIndexServiceHTTPSDisabled:  !Equals [!Ref "IndexServiceCertificateARN", ""]
+  IsVolumeSnapshotRetentionDaysEnabled: !Not [ !Equals [!Ref "VolumeSnapshotRetentionDays", "0"] ]
+  IsVolumeSnapshotEnabled: !Not [ !Equals [!Ref "VolumeSnapshotId", ""] ]
+
+Mappings:
+  TaskConfig:
+    t3.small:
+      cpu: 800
+      memory:  750
+    t3.medium:
+      cpu: 800
+      memory:  1500
+    t3.large:
+      cpu: 800
+      memory: 3125
+    t3.xlarge:
+      cpu: 1750
+      memory:  7000
+    t3.2xlarge:
+      cpu: 3750
+      memory:  15000
+    c5.large:
+      cpu: 750
+      memory:  1250
+    c5.xlarge:
+      cpu: 1700
+      memory:  3500
+    c5.2xlarge:
+      cpu: 3750
+      memory:  7000
+    c5.4xlarge:
+      cpu: 7750
+      memory: 14750
+    c5.9xlarge:
+      cpu: 17750
+      memory: 34500
+    c5.12xlarge:
+      cpu: 23750
+      memory: 46250
+    c5.18xlarge:
+      cpu: 35750
+      memory: 70000
+    c5.24xlarge:
+      cpu: 47750
+      memory: 93750
+
+
+Resources:
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: !Sub ${AppName}-ECS-Cluster
+
+  EcsHostSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AppName}-ECS-Security-Group
+      GroupDescription: Access to the ECS hosts that run containers
+      VpcId: !Ref ApplicationVPC
+
+  EcsSecurityGroupIngressFromSelf:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress from other containers in the same security group
+      GroupId: !Ref EcsHostSecurityGroup
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref EcsHostSecurityGroup
+
+  ElasticacheRedisSecurityGroup:
+    Condition: LtoEnabledRedisFlag  
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupName: !Sub ${AppName}-ECS-Redis-Group
+      GroupDescription:  Access to the Redis 
+      VpcId: !Ref ApplicationVPC
+
+  ElasticacheRedisSecurityGroupIngress:
+      Condition: LtoEnabledRedisFlag
+      Type: AWS::EC2::SecurityGroupIngress
+      Properties:
+        Description: Ingress from other containers in the same security group
+        GroupId: !Ref EcsHostSecurityGroup
+        IpProtocol: tcp
+        FromPort: 6379
+        ToPort: 6379
+        SourceSecurityGroupId: !GetAtt EcsHostSecurityGroup.GroupId
+
+  EcsSecurityGroupIngressForAPI:
+    Condition: LtoApiEnabledFlag
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress via 6869 if API Enabled 
+      GroupId: !Ref EcsHostSecurityGroup
+      IpProtocol: tcp
+      FromPort: 6869
+      ToPort: 6869
+      CidrIp: 0.0.0.0/0
+
+  EcsSecurityGroupIngressForIndexWithHTTPS:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress via 80 for Reverse Proxy
+      GroupId: !Ref EcsHostSecurityGroup
+      IpProtocol: tcp
+      FromPort: 80
+      ToPort: 80
+      SourceSecurityGroupId: !GetAtt ECSLoadBalancerSecurityGroup.GroupId
+
+  ECSLoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupName: !Sub ${AppName}-ECS-ALB
+      GroupDescription:  Access to the ALB
+      VpcId: !Ref ApplicationVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  ECSStaticEIP:
+    Type: AWS::EC2::EIP
+
+
+  ElastiCacheRedisCluster:
+    Condition: LtoEnabledRedisFlag
+    Type: AWS::ElastiCache::CacheCluster
+    Properties:
+      AutoMinorVersionUpgrade: true
+      Engine: redis
+      EngineVersion: 5.0.6
+      CacheNodeType: !Ref IndexerRedisInstanceSize
+      ClusterName : !Sub "${AppName}-Redis-Cluster"
+      NumCacheNodes: '1'
+      VpcSecurityGroupIds: 
+        - !GetAtt ElasticacheRedisSecurityGroup.GroupId
+      Tags:
+        - Key: Name
+          Value: !Sub "${AppName}-Redis-Cluster"
+
+
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      ContainerDefinitions:
+        - Name: !Ref AppName
+          MountPoints:
+            - SourceVolume: lto-data
+              ContainerPath: /lto/data
+          Image: !Sub "ltonetwork/public-node:${AppNodeTag}"
+          Cpu: !If [ AllowHighCapacityInstanceSize , !FindInMap [ TaskConfig, !Ref HighCapacityInstanceSize, cpu ] , !FindInMap [ TaskConfig, !Ref LowCapacityInstanceSize, cpu ] ]
+          Memory: !If [ AllowHighCapacityInstanceSize , !FindInMap [ TaskConfig, !Ref HighCapacityInstanceSize, memory ] , !FindInMap [ TaskConfig, !Ref LowCapacityInstanceSize, memory ]]
+          Essential: true
+          PortMappings:
+            - ContainerPort: 6869
+              HostPort: 6869
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref AppName
+              awslogs-create-group: true
+              awslogs-stream-prefix: ecs
+              awslogs-region: !Ref AWS::Region
+          Environment:
+            - Name: LTO_API_KEY
+              Value: !GetAtt RandomAPIKey.RandomString
+            - Name: LTO_NETWORK
+              Value: !Ref LtoNetwork
+            - Name: LTO_WALLET_SEED
+              Value: !Ref LtoWalletSeed
+            - Name: LTO_NODE_NAME
+              Value: !Ref LtoNodeName
+            - Name: LTO_ENABLE_REST_API
+              Value: true
+            - Name: LTO_ENABLE_MINING 
+              Value: !Ref LtoEnableMining
+
+        - Name: !Sub "${AppName}-Index"
+          MountPoints:
+            - SourceVolume: lto-index
+              ContainerPath: /usr/app/lto-index
+          Image: !Sub "ltonetwork/indexer:${AppIndexTag}"
+          Cpu: !If [ AllowHighCapacityInstanceSize , !FindInMap [ TaskConfig, !Ref HighCapacityInstanceSize, cpu ] , !FindInMap [ TaskConfig, !Ref LowCapacityInstanceSize, cpu ] ]
+          Memory: !If [ AllowHighCapacityInstanceSize , !FindInMap [ TaskConfig, !Ref HighCapacityInstanceSize, memory ] , !FindInMap [ TaskConfig, !Ref LowCapacityInstanceSize, memory ]]
+          Essential: true
+          DependsOn:
+            - ContainerName: !Ref AppName
+              Condition: START
+          PortMappings:
+            - ContainerPort: 8080
+              HostPort: 8080
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub "${AppName}-Index"
+              awslogs-create-group: true
+              awslogs-stream-prefix: ecs
+              awslogs-region: !Ref AWS::Region
+          Environment:
+            - Name: NODE_ENV
+              Value: production
+            - Name: NODE_URL
+              Value: !Sub "http://${ECSStaticEIP}:6869"
+            - Name: IDENTITY_INDEXING
+              Value: !Ref LtoIdentiyIndexing
+            - Name: TRANSACTION_INDEXING
+              Value: !Ref LtoTransactionIndexing
+            - Name: STATS_INDEXING
+              Value: !Ref LtoStatsIndexing
+            - Name: ASSOCIATION_INDEXING
+              Value: !Ref LtoAssociationIndexing
+            - Name: ANCHOR_INDEXING
+              Value: !Ref LtoAnchorIndexing
+            - Name: PORT
+              Value: 8080
+            - Name: REDIS_URL
+              Value: !If [ LtoEnabledRedisFlag, !Sub "redis://${ElastiCacheRedisCluster.RedisEndpoint.Address}", !Ref AWS::NoValue ]
+            - Name: LTO__MAX_ROLLBACK_DEPTH
+              Value: !If [ LtoFullHistory, 10000000, !Ref AWS::NoValue ]
+            - Name: LTO__INDEX_ALL_TRANSACTIONS
+              Value: !If [ LtoFullHistory, "true", !Ref AWS::NoValue ]
+
+        - Name: !Sub "${AppName}-Nginx"
+          MountPoints:
+            - SourceVolume: lto-nginx
+              ContainerPath: /etc/nginx/
+          Image: nginx
+          Cpu: 256
+          Memory: 512
+          Essential: false
+          DependsOn:
+            - ContainerName: !Ref AppName
+              Condition: START
+            - ContainerName: !Ref AppName
+              Condition: START
+          PortMappings:
+            - ContainerPort: 80
+              HostPort: 80
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Sub "${AppName}-Nginx"
+              awslogs-create-group: true
+              awslogs-stream-prefix: ecs
+              awslogs-region: !Ref AWS::Region
+
+      Volumes:
+        - Host:
+            SourcePath: /mnt/lto-data
+          Name: lto-data
+        - Host:
+            SourcePath: /mnt/lto-data/lto-index
+          Name: lto-index
+        - Host:
+            SourcePath: /tmp/nginx
+          Name: lto-nginx
+        
+
+
+  # Beauty Of Depends on And Condition Simultaneously
+
+  HTTPSListerWaitHandle: 
+    Condition: IsIndexServiceHTTPSEnabled
+    DependsOn: 
+      - ECSLoadBalancerHTTPSListener
+      - ECSLoadBalancerHTTPListener
+    Type: "AWS::CloudFormation::WaitConditionHandle"
+
+  HTTPListerWaitHandle: 
+    Condition: IsIndexServiceHTTPSDisabled
+    DependsOn: 
+      - ECSLoadBalancerListenerHTTPOnly
+    Type: "AWS::CloudFormation::WaitConditionHandle"
+
+
+  WaitHandle: 
+    Type: "AWS::CloudFormation::WaitConditionHandle"
+
+  WaitCondition: 
+    Type: "AWS::CloudFormation::WaitCondition"
+    Properties: 
+      Handle: !If [  IsIndexServiceHTTPSEnabled  , !Ref HTTPSListerWaitHandle, !Ref WaitHandle ] 
+      Timeout: "1"
+      Count: 0
+
+  WaitConditionHTTPOnly: 
+    Type: "AWS::CloudFormation::WaitCondition"
+    Properties: 
+      Handle: !If [  IsIndexServiceHTTPSDisabled  , !Ref HTTPListerWaitHandle, !Ref WaitHandle ] 
+      Timeout: "1"
+      Count: 0
+
+
+  ECSService: 
+    DependsOn:
+      - WaitCondition
+      - WaitConditionHTTPOnly
+    Type: AWS::ECS::Service
+    Properties:
+      ServiceName: !Sub ${AppName}-ECS-Service
+      Cluster: !Ref ECSCluster
+      HealthCheckGracePeriodSeconds:  300 
+      DesiredCount: 1
+      DeploymentConfiguration:
+        MaximumPercent: 100
+        MinimumHealthyPercent: 0
+      TaskDefinition: !Ref TaskDefinition
+      LoadBalancers:
+          !If 
+            - IsIndexServiceHTTPSEnabled 
+            -  
+              - ContainerName: !Sub "${AppName}-Nginx"
+                ContainerPort: 80
+                TargetGroupArn:  !Ref ECSTargetGroup
+            -
+              - ContainerName: !Sub "${AppName}-Nginx"
+                ContainerPort: 80
+                TargetGroupArn:  !Ref ECSTargetGroupHTTPOnly
+
+# ECS Load Balancer for HTTPS Specific Routing START
+  ECSElasticLoadBalancer:
+    Condition: IsIndexServiceHTTPSEnabled
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Subnets:
+        - !Ref ApplicationLoadBalancerSubnetAZ1
+        - !Ref ApplicationLoadBalancerSubnetAZ2
+      SecurityGroups:
+        - !Ref ECSLoadBalancerSecurityGroup
+      
+  ECSLoadBalancerHTTPListener:
+    Condition: IsIndexServiceHTTPSEnabled
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: "redirect"
+          RedirectConfig:
+            Protocol: "HTTPS"
+            Port: 443
+            Host: "#{host}"
+            Path: "/#{path}"
+            Query: "#{query}"
+            StatusCode: "HTTP_301"
+      LoadBalancerArn: !Ref ECSElasticLoadBalancer
+      Port: 80
+      Protocol: HTTP
+
+  ECSLoadBalancerHTTPSListener:
+    Condition: IsIndexServiceHTTPSEnabled
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: "forward"
+          TargetGroupArn:  !Ref ECSTargetGroup
+      LoadBalancerArn: !Ref ECSElasticLoadBalancer
+      Port: 443
+      Protocol: HTTPS
+      Certificates: 
+        - !Ref IndexServiceCertificateARN
+
+  ECSTargetGroup:
+    Condition: IsIndexServiceHTTPSEnabled
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      # Name: !Sub "${AppName}"
+      Port: 80
+      HealthCheckPath: '/api-docs/'
+      Protocol: HTTP
+      Matcher:
+        HttpCode: '308'
+      VpcId: !Ref ApplicationVPC
+    DependsOn:
+      - ECSElasticLoadBalancer
+
+# ECS Load Balancer for HTTPS Specific Routing END 
+# ECS Load Balancer for HTTP  Specific Routing START
+  ECSElasticLoadBalancerHTTPOnly:
+    Condition: IsIndexServiceHTTPSDisabled
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Subnets:
+        - !Ref ApplicationLoadBalancerSubnetAZ1
+        - !Ref ApplicationLoadBalancerSubnetAZ2
+      SecurityGroups:
+        - !Ref ECSLoadBalancerSecurityGroup
+      
+  # ECSLoadBalancerHTTPListener:
+  #   Condition: IsIndexServiceHTTPSEnabled
+  #   Type: AWS::ElasticLoadBalancingV2::Listener
+  #   Properties:
+  #     DefaultActions:
+  #       - Type: "redirect"
+  #         RedirectConfig:
+  #           Protocol: "HTTPS"
+  #           Port: 443
+  #           Host: "#{host}"
+  #           Path: "/#{path}"
+  #           Query: "#{query}"
+  #           StatusCode: "HTTP_301"
+  #     LoadBalancerArn: !Ref ECSElasticLoadBalancer
+  #     Port: 80
+  #     Protocol: HTTP
+
+  ECSLoadBalancerListenerHTTPOnly:
+    Condition: IsIndexServiceHTTPSDisabled
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: "forward"
+          TargetGroupArn:  !Ref ECSTargetGroupHTTPOnly
+      LoadBalancerArn: !Ref ECSElasticLoadBalancerHTTPOnly
+      Port: 80
+      Protocol: HTTP
+      # Certificates: 
+      #   - !Ref IndexServiceCertificateARN
+
+  ECSTargetGroupHTTPOnly:
+    Condition: IsIndexServiceHTTPSDisabled
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      # Name: !Sub "${AppName}-HTTP"
+      Port: 80
+      HealthCheckPath: '/api-docs/'
+      Protocol: HTTP
+      Matcher:
+        HttpCode: '308'
+      VpcId: !Ref ApplicationVPC
+    DependsOn:
+      - ECSElasticLoadBalancerHTTPOnly
+# ECS Load Balancer for HTTP  Specific Routing END 
+  ECSAutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      VPCZoneIdentifier:
+        - !Ref ApplicationSubnet
+      AvailabilityZones:
+        - !Ref ApplicationAZ
+      LaunchConfigurationName: !Ref ContainerInstances
+      MinSize: 1
+      MaxSize: 1
+      DesiredCapacity: 1
+      Tags:
+        - Key: Name
+          Value: !Ref AppName
+          PropagateAtLaunch: "true"
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT15M
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: true
+
+  LtoDataVolume:
+    Type: AWS::EC2::Volume
+    # DeletionPolicy: "Snapshot"
+    Properties: 
+      VolumeType: "gp2" 
+      Size: !If  [ IsVolumeSnapshotEnabled , !Ref AWS::NoValue, "100" ]
+      Encrypted: true
+      AvailabilityZone: !Ref ApplicationAZ
+      SnapshotId: !If  [ IsVolumeSnapshotEnabled , !Ref VolumeSnapshotId,  !Ref AWS::NoValue ]
+      Tags:
+        - Key: Name
+          Value: lto-data
+
+
+  VolumeNameStorage:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub "/${AWS::StackName}/${ECSCluster}/volumeid"
+      Type: String
+      Value: !Ref LtoDataVolume
+      Description: !Sub "SSM Parameter for ${AWS::StackName}"
+
+  ContainerInstances:
+    Type: AWS::AutoScaling::LaunchConfiguration
+    Properties:
+      ImageId: !Ref ECSAMI
+      SecurityGroups: [!Ref EcsHostSecurityGroup]
+      InstanceType:  !If [ AllowHighCapacityInstanceSize, !Ref HighCapacityInstanceSize , !Ref LowCapacityInstanceSize]
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      SpotPrice: 10
+      AssociatePublicIpAddress: true
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash -xe
+          echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+          yum install -y aws-cfn-bootstrap  unzip jq
+
+          echo Install AWS CLI
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+          EBS=$(curl http://169.254.169.254/latest/meta-data/block-device-mapping/ebs1/)
+          AZ=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone )
+          INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+          INSTANCE_PRIVATE_HOSTNAME=$(curl http://169.254.169.254/latest/meta-data/hostname)
+
+          SSMVolumeID=$(/usr/local/bin/aws ssm get-parameters --region ${AWS::Region} --names "/${AWS::StackName}/${ECSCluster}/volumeid" --with-decryption --query Parameters[0].Value | jq -r . )
+
+          if [ $SSMVolumeID != null ]
+          then
+            echo "Already Disk Available. Attach and Mounting It " 
+            /usr/local/bin/aws ec2 attach-volume --volume-id  $SSMVolumeID --instance-id $INSTANCE_ID --device /dev/xvdf && true
+            echo "/dev/xvdf  /mnt/lto-data xfs defaults,noatime 0 0">>/etc/fstab
+            mkdir  /mnt/lto-data
+            sleep 60
+            lsblk
+            mkfs -t xfs /dev/xvdf && true
+            blkid
+            mount -a
+            df -h
+            mkdir /mnt/lto-data/lto-index && true
+          fi
+
+          echo "First Disassociate The Reassociate"
+          /usr/local/bin/aws ec2 disassociate-address --public-ip ${ECSStaticEIP} && true
+          echo "Associate EC2 Address"
+          /usr/local/bin/aws  ec2 associate-address --instance-id  $INSTANCE_ID  --public-ip ${ECSStaticEIP} && true
+          
+          echo "Create nginx.conf file in /tmp folder"
+          mkdir  /tmp/nginx/ && true
+          cat <<EOT >> /tmp/nginx/nginx.conf
+              worker_processes 1;
+              events { worker_connections 1024; }
+              http {
+                  sendfile on;
+                  upstream public-node {
+                     server $INSTANCE_PRIVATE_HOSTNAME:6869;
+                  }
+                  upstream indexer {
+                      server $INSTANCE_PRIVATE_HOSTNAME:8080;
+                  }
+                  server {
+                      listen 80;
+                      location / {
+                          proxy_pass         http://public-node;
+                          proxy_redirect     off;
+                          proxy_set_header   Host \$host;
+                          proxy_set_header   X-Real-IP \$remote_addr;
+                          proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
+                          proxy_set_header   X-Forwarded-Host \$server_name;
+                          proxy_next_upstream error timeout http_502;
+                      }
+                      location /index/ {
+                          proxy_pass         http://indexer/;
+                          proxy_redirect     off;
+                          proxy_set_header   Host \$host;
+                          proxy_set_header   X-Real-IP \$remote_addr;
+                          proxy_set_header   X-Forwarded-For \$proxy_add_x_forwarded_for;
+                          proxy_set_header   X-Forwarded-Host \$server_name;
+                      }
+                  }
+              }
+          EOT
+          /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --resource ECSAutoScalingGroup --region ${AWS::Region}
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub ${AppName}-InstanceProfile-Role
+      Path: /
+      Roles: [!Ref EC2Role]
+
+  # Role for the EC2 hosts. This allows the ECS agent on the EC2 hosts
+  # to communciate with the ECS control plane, as well as download the docker
+  # images from ECR to run on your host.
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AppName}-EC2-Role
+      ManagedPolicyArns: 
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [ec2.amazonaws.com]
+          Action: [sts:AssumeRole]
+      Path: /
+      Policies:
+      - PolicyName: ecs-service
+        PolicyDocument:
+          Statement:
+          - Effect: Allow
+            Action:
+              - ecs:CreateCluster
+              - ecs:DeregisterContainerInstance
+              - ecs:DiscoverPollEndpoint
+              - ecs:Poll
+              - ecs:RegisterContainerInstance
+              - ecs:StartTelemetrySession
+              - ecs:Submit*
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - ecr:GetAuthorizationToken
+              - ecr:BatchGetImage
+              - ecr:GetDownloadUrlForLayer
+              - ec2:AssociateAddress
+              - ec2:DisassociateAddress
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - ec2:AttachVolume
+            Resource:
+              - !Sub arn:*:ec2:${AWS::Region}:${AWS::AccountId}:volume/${LtoDataVolume}
+              - !Sub arn:*:ec2:${AWS::Region}:${AWS::AccountId}:instance/*
+          - Effect: Allow
+            Action: ec2:DescribeVolumes
+            Resource: !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/*
+          - Effect: Allow
+            Action:
+              - ssm:PutParameter
+              - ssm:GetParameter
+            Resource: !Sub arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/*${AWS::StackName}*
+
+  LambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AppName}-LambdaExecution-Role
+      Policies: 
+        - PolicyName: LambdaExecutionPolicy
+          PolicyDocument:
+            Statement:
+              - Sid: "AllowLogGroupCreation"
+                Effect: Allow
+                Action: 
+                  - logs:CreateLogGroup
+                Resource: 
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:${AppName}*"
+              - Sid: "AllowLogStreamCreation"
+                Effect: Allow
+                Action:
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: "*"
+              - Sid: "AllowCloudwatchPutMetricsAlarm"
+                Effect: Allow
+                Action:
+                  - cloudwatch:PutMetricAlarm
+                Resource: "*"
+              - Sid: "PassRoleToService"
+                Effect: Allow
+                Action: 
+                  - iam:PassRole
+                Resource: "*"
+              - Sid: "EC2DescribePermission"
+                Effect: Allow
+                Action: 
+                  - ec2:DescribeVolumes
+                  - ec2:DetachVolume
+                  - ec2:DescribeVpcs
+                  - ec2:DescribeSubnets
+                  - ec2:DescribeImages
+                  - ec2:DescribeAvailabilityZones
+                  - ec2:DescribeInstances
+                  - ec2:RevokeSecurityGroupIngress
+                  - ec2:DescribeSecurityGroups
+                Resource: "*"
+              - Sid: "EC2RevokeSecurityGroupIngress"
+                Effect: Allow
+                Action: 
+                  - ec2:RevokeSecurityGroupIngress
+                Resource: !Sub arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:security-group/${EcsHostSecurityGroup}
+              - Sid: "EC2DetachVolumePermission"
+                Effect: Allow
+                Action: 
+                  - ec2:DetachVolume
+                Resource: !Sub arn:*:ec2:${AWS::Region}:${AWS::AccountId}:volume/${LtoDataVolume}
+              - Sid: "AllowECSDescribeServices"
+                Effect: Allow
+                Action: 
+                  - ecs:DescribeServices
+                Resource: "*"
+              - Sid: "AllowECSTaskDefiniationSpecifics"
+                Effect: Allow
+                Action: 
+                  - ecs:DeregisterTaskDefinition
+                  - ecs:RegisterTaskDefinition
+                Resource: "*"
+              - Sid: "AllowECSUpdateServiceSpecifics"
+                Effect: Allow
+                Action: 
+                  - ecs:UpdateService
+                Resource:
+                  - !Sub arn:aws:ecs:${AWS::Region}:${AWS::AccountId}:task-definition/${AWS::StackName}-TaskDefinition-*
+                  - !Sub ${ECSService}
+              - Sid: "AllowCloudformationUpdateAccess"
+                Effect: Allow
+                Action: 
+                  - cloudformation:UpdateStack
+                Resource: !Sub ${AWS::StackId}
+              - Sid: "AllowAutoscalingDescribeAccess"
+                Effect: Allow
+                Action: 
+                  - autoscaling:DescribeAutoScalingGroups
+                  - autoscaling:DescribeScalingActivities
+                  - autoscaling:DescribeAutoScalingInstances
+                  - autoscaling:DescribeLaunchConfigurations
+                Resource: "*"
+              - Sid: "AllowAutoscalingUpdateOrDeleteAccess"
+                Effect: Allow
+                Action: 
+                  - autoscaling:CreateAutoScalingGroup
+                  - autoscaling:CreateLaunchConfiguration
+                  - autoscaling:DeleteLaunchConfiguration
+                  - autoscaling:UpdateAutoScalingGroup
+                  - autoscaling:DeleteAutoScalingGroup
+                Resource: 
+                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:autoScalingGroup:*:autoScalingGroupName/${AWS::StackName}-*
+                  - !Sub arn:aws:autoscaling:${AWS::Region}:${AWS::AccountId}:launchConfiguration:*:launchConfigurationName/${AWS::StackName}-*
+              - Sid: "GenericDescribeActions"
+                Effect: Allow
+                Action: 
+                  - kms:Decrypt
+                  - iam:GetRole
+                Resource: "*"
+              - Sid: "SSMGetParameter"
+                Effect: Allow
+                Action: 
+                  - ssm:GetParameters
+                Resource: "*"
+              - Sid: "AllowSNS"
+                Effect: Allow
+                Action: 
+                  - sns:GetTopicAttributes
+                  - sns:CreateTopic
+                Resource: "*"
+              - Sid: "AllowDescribeCache"
+                Effect: Allow
+                Action:
+                  - elastiCache:DescribeCacheClusters
+                Resource: "*"
+              - Sid: "AllowALBDescribe"
+                Effect: Allow
+                Action:
+                  - elasticloadbalancing:DescribeLoadBalancers
+                Resource: "*"
+
+                
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub ${AppName}-LambdaFunction
+      Runtime: python3.8
+      Role: !GetAtt LambdaExecutionRole.Arn
+      Timeout: 100
+      Handler: index.lambda_handler
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          import os
+
+          volumeid=os.environ['VOLUMEID']
+          stackname=os.environ['STACKNAME']
+          aws_region=os.environ['REGION']
+
+          EC2_RESOURCE = boto3.resource('ec2', region_name=aws_region)
+          EC2_CLIENT = boto3.client('ec2', region_name=aws_region)
+
+          stack_client = boto3.client('cloudformation')
+
+          def lambda_handler(event, context):
+
+              volume = EC2_RESOURCE.Volume(volumeid)
+              attachments=volume.attachments
+              attachment = attachments[0]
+
+              try: 
+                volume.detach_from_instance(
+                      Device='/dev/xvdf',
+                      InstanceId=attachment["InstanceId"],
+                  )
+              except Exception as e:
+                print(f"Device Detachment Error: {e}")
+                return -1 ;
+              
+              waiter = EC2_CLIENT.get_waiter('volume_available')
+              waiter.wait(
+                  VolumeIds=[
+                      volume.id,
+                  ]
+                )
+              try: 
+                response = stack_client.update_stack(
+                  StackName=stackname,
+                  UsePreviousTemplate=True,
+                  Parameters=[
+                      {
+                          'ParameterKey': 'AppName',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'AppNodeTag',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'AppIndexTag',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'ApplicationState',
+                          'ParameterValue': 'low'
+                      },
+                      {
+                          'ParameterKey': 'ApplicationSubnet',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'ApplicationVPC',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'ApplicationAZ',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'ApplicationLoadBalancerSubnetAZ1',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'ApplicationLoadBalancerSubnetAZ2',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'IndexServiceCertificateARN',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoWalletSeed',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoNetwork',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoNodeName',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoFeatures',
+                          'UsePreviousValue': True
+                      }, 
+                      {
+                          'ParameterKey': 'LtoEnableMining',
+                          'UsePreviousValue': True
+                      }, 
+                      {
+                          'ParameterKey': 'LtoIndexDBType',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoAssociationIndexing',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoAnchorIndexing',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoIdentiyIndexing',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoTransactionIndexing',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LtoStatsIndexing',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'IndexerRedisInstanceSize',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'HighCapacityInstanceSize',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'LowCapacityInstanceSize',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'ECSAMI',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'VolumeSnapshotId',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'VolumeSnapshotRetentionDays',
+                          'UsePreviousValue': True
+                      }
+                  ],
+                  Capabilities=[
+                      'CAPABILITY_IAM','CAPABILITY_NAMED_IAM','CAPABILITY_AUTO_EXPAND'
+                  ]
+                  )
+              except Exception as e: 
+                print(f"Stack update failed: {e}")
+                return -1 
+      Description: Lambda To Resize Instance Automagically
+      TracingConfig:
+        Mode: Active
+      Environment:
+        Variables:
+          VOLUMEID: !Ref LtoDataVolume
+          STACKNAME: !Ref AWS::StackName
+          REGION: !Ref AWS::Region
+          SERVCIE: !Ref ECSService
+
+  ECSSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Sub "${AppName}-SNSTopic"
+
+  ECSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint: !GetAtt LambdaFunction.Arn 
+      Protocol: lambda
+      TopicArn: !Ref ECSSNSTopic
+
+  ECSLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref LambdaFunction
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref ECSSNSTopic
+
+  ECSCPUAlarmLow:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmDescription: Scale-down if CPU is less than 10% for 5 minutes
+      MetricName: CPUUtilization
+      Namespace: AWS/ECS
+      Statistic: Average
+      ActionsEnabled: !If [ AllowHighCapacityInstanceSize , TRUE , FALSE ] 
+      Period: 900
+      EvaluationPeriods: 2
+      Threshold: 10
+      AlarmActions:
+        - !Ref ECSSNSTopic
+      Dimensions:
+        - Name: ClusterName
+          Value: !Ref ECSCluster
+      ComparisonOperator: LessThanThreshold
+
+  RandomLambdaExecutionRole:
+        Type: AWS::IAM::Role
+        Properties:
+          AssumeRolePolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+            - Effect: Allow
+              Principal:
+                Service:
+                - lambda.amazonaws.com
+              Action:
+              - sts:AssumeRole
+          Policies:
+            -
+              PolicyName: allowLambdaLogging
+              PolicyDocument:
+                Version: "2012-10-17"
+                Statement:
+                  -
+                    Effect: "Allow"
+                    Action:
+                      - "logs:*"
+                    Resource: "*"
+
+  RandomStringLambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: index.lambda_handler
+      Timeout: 10
+      Role: !GetAtt "RandomLambdaExecutionRole.Arn"
+      Runtime: python3.8
+      Code:
+        ZipFile: |
+          import cfnresponse
+          from random import choice
+          from string import ascii_lowercase, digits
+          def random_string(length=8, chars=ascii_lowercase + digits):
+            return "".join(choice(chars) for x in range(length))
+          def lambda_handler(event, context):
+            print(f"Data in event: {event}")
+            response_data = {}
+            if event["RequestType"] == "Create":
+              string_length = int(event["ResourceProperties"]["Length"])
+              physicalResourceId = random_string(string_length)
+              response_data = { "RandomString": physicalResourceId }
+            
+            else: # if event["RequestType"] == "Update" or event["RequestType"] == "Delete":
+              physicalResourceId = event["PhysicalResourceId"]
+            cfnresponse.send(event, context, cfnresponse.SUCCESS, response_data, physicalResourceId)
+
+  RandomAPIKey:
+    Type: AWS::CloudFormation::CustomResource
+    Properties:
+      Length: 16
+      ServiceToken: !GetAtt RandomStringLambdaFunction.Arn
+
+  EndPointHealthCheckHTTPSDisabled: 
+    Condition: IsIndexServiceHTTPSDisabled
+    Type: 'AWS::Route53::HealthCheck'
+    Properties: 
+      HealthCheckConfig: 
+        Port: 80
+        Type: HTTP
+        ResourcePath: '/index/health'
+        FullyQualifiedDomainName: !Sub "${ECSElasticLoadBalancerHTTPOnly.DNSName}"
+        RequestInterval: 30
+        FailureThreshold: 3
+      HealthCheckTags: 
+        - 
+          Key: Name
+          Value: !Sub ${AppName}-monitoring
+
+  EndPointHealthCheckHTTPSEnabled: 
+    Condition: IsIndexServiceHTTPSEnabled
+    Type: 'AWS::Route53::HealthCheck'
+    Properties: 
+      HealthCheckConfig: 
+        Port: 443
+        Type: HTTPS
+        ResourcePath: '/index/health'
+        FullyQualifiedDomainName: !Sub "${ECSElasticLoadBalancer.DNSName}"
+        RequestInterval: 30
+        FailureThreshold: 3
+      HealthCheckTags: 
+        - 
+          Key: Name
+          Value: !Sub ${AppName}-monitoring
+
+
+  LifeCyclePolicyManagementRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AppName}-Lifecycle-Management-Role
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [dlm.amazonaws.com]
+          Action: [sts:AssumeRole]
+      Path: /
+      Policies:
+      - PolicyName: dlm-default-permission
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:CreateSnapshot
+                - ec2:CreateSnapshots
+                - ec2:DeleteSnapshot
+                - ec2:DescribeInstances
+                - ec2:DescribeVolumes
+                - ec2:DescribeSnapshots
+                - ec2:EnableFastSnapshotRestores
+                - ec2:DescribeFastSnapshotRestores
+                - ec2:DisableFastSnapshotRestores
+                - ec2:CopySnapshot
+                - ec2:ModifySnapshotAttribute
+                - ec2:DescribeSnapshotAttribute
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - ec2:CreateTags
+              Resource: arn:aws:ec2:*::snapshot/*
+            - Effect: Allow
+              Action:
+                - ec2:CreateTags
+                - events:PutRule
+                - events:DeleteRule
+                - events:DescribeRule
+                - events:EnableRule
+                - events:DisableRule
+                - events:ListTargetsByRule
+                - events:PutTargets
+                - events:RemoveTargets
+              Resource: arn:aws:events:*:*:rule/AwsDataLifecycleRule.managed-cwe.*
+
+  EBSDiskLifecyclePolicy:
+    Type: AWS::DLM::LifecyclePolicy
+    Condition: IsVolumeSnapshotRetentionDaysEnabled
+    Properties:
+      Description: Lifecycle Policy using CloudFormation
+      State: ENABLED
+      ExecutionRoleArn: !GetAtt LifeCyclePolicyManagementRole.Arn
+      PolicyDetails:
+        ResourceTypes:
+          - VOLUME
+        TargetTags:
+          - Key: Name
+            Value: lto-data
+        Schedules:
+          - Name: Daily Snapshots
+            TagsToAdd:
+              - Key: Name
+                Value: lto-data
+            CreateRule:
+              Interval: 24
+              IntervalUnit: HOURS
+              Times:
+                - '03:00'
+            RetainRule:
+              Count: !Ref VolumeSnapshotRetentionDays
+            CopyTags: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AppName}-Lifecycle-Policy"
+
+
+Outputs:
+  ReverseProxyLoadBalancerURI:
+      Condition: IsIndexServiceHTTPSEnabled
+      Value: !Sub "https://${ECSElasticLoadBalancer.DNSName}"
+      Description: "Indexer Load Balancer URI"
+  IndexerLoadBalancerURI:
+      Condition: IsIndexServiceHTTPSEnabled
+      Value: !Sub "https://${ECSElasticLoadBalancer.DNSName}/index/"
+      Description: "Indexer Load Balancer URI"
+  ReverseProxyLoadBalancerURIHTTPOnly:
+      Condition: IsIndexServiceHTTPSDisabled
+      Value: !Sub "http://${ECSElasticLoadBalancerHTTPOnly.DNSName}"
+      Description: "Indexer Load Balancer URI HTTP Only"
+  IndexerLoadBalancerURIHTTPOnly:
+      Condition: IsIndexServiceHTTPSDisabled
+      Value: !Sub "http://${ECSElasticLoadBalancerHTTPOnly.DNSName}/index/"
+      Description: "Indexer Load Balancer URI HTTP Only"
+
+  RandomAPIKey:
+      Value: !GetAtt RandomAPIKey.RandomString
+      Description: "Random Genarated API Key"
