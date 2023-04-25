@@ -178,7 +178,7 @@ Parameters:
     Default: true
   IndexerRedisInstanceSize:
     Type: String
-    AllowedValues: [cache.t3.small, cache.t3.medium,cache.t3.large,cache.r6g.large, cache.r6g.xlarge, cache.r6g.2xlarge, cache.r6g.4xlarge, cache.r6g.8xlarge, cache.r6g.12xlarge, cache.r6g.16xlarge, cache.r6g.24xlarge]
+    AllowedValues: ["",cache.t3.small, cache.t3.medium,cache.t3.large,cache.r6g.large, cache.r6g.xlarge, cache.r6g.2xlarge, cache.r6g.4xlarge, cache.r6g.8xlarge, cache.r6g.12xlarge, cache.r6g.16xlarge, cache.r6g.24xlarge]
     Description: AWS Elasticache instance size for Redis DB ( If Redis is selected as database type )
     ConstraintDescription: Please choose an instance size
   ECSAMI:
@@ -237,10 +237,11 @@ Parameters:
 
 Conditions:
   AllowHighCapacityInstanceSize: !Equals [ !Ref ApplicationState, high ]
-  LtoApiEnabledFlag: !Equals  [ true , true ]
+  LtoApiEnabledFlag: !Equals [ true , true ]
   LtoEnabledRedisFlag: !Equals [ !Ref LtoIndexDBType , 'Redis' ]
-  IsIndexServiceHTTPSEnabled:  !Not [ !Equals [!Ref "IndexServiceCertificateARN", ""] ]
-  IsIndexServiceHTTPSDisabled:  !Equals [!Ref "IndexServiceCertificateARN", ""]
+  LtoFullHistoryFlag: !Equals [ true, true ]
+  IsIndexServiceHTTPSEnabled: !Not [ !Equals [!Ref "IndexServiceCertificateARN", ""] ]
+  IsIndexServiceHTTPSDisabled: !Equals [!Ref "IndexServiceCertificateARN", ""]
   IsVolumeSnapshotRetentionDaysEnabled: !Not [ !Equals [!Ref "VolumeSnapshotRetentionDays", "0"] ]
   IsVolumeSnapshotEnabled: !Not [ !Equals [!Ref "VolumeSnapshotId", ""] ]
 
@@ -464,9 +465,9 @@ Resources:
             - Name: REDIS_URL
               Value: !If [ LtoEnabledRedisFlag, !Sub "redis://${ElastiCacheRedisCluster.RedisEndpoint.Address}", !Ref AWS::NoValue ]
             - Name: LTO__MAX_ROLLBACK_DEPTH
-              Value: !If [ LtoFullHistory, 10000000, !Ref AWS::NoValue ]
+              Value: !If [ LtoFullHistoryFlag, 10000000, !Ref AWS::NoValue ]
             - Name: LTO__INDEX_ALL_TRANSACTIONS
-              Value: !If [ LtoFullHistory, "true", !Ref AWS::NoValue ]
+              Value: !If [ LtoFullHistoryFlag, "true", !Ref AWS::NoValue ]
 
         - Name: !Sub "${AppName}-Nginx"
           MountPoints:
@@ -1104,7 +1105,11 @@ Resources:
                       {
                           'ParameterKey': 'LtoEnableMining',
                           'UsePreviousValue': True
-                      }, 
+                      },
+                      {
+                          'ParameterKey': 'LtoFullHistory',
+                          'UsePreviousValue': True
+                      },
                       {
                           'ParameterKey': 'LtoIndexDBType',
                           'UsePreviousValue': True
