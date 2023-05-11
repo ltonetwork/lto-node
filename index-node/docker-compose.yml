@@ -1,0 +1,50 @@
+version: "2.4"
+
+services:
+  nginx:
+    container_name: nginx
+    image: ltonetwork/public-node-proxy
+    ports:
+      - ${PORT:-80}:80
+    networks:
+      - lto
+
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node:${NODE_VERSION:-latest}
+    mem_reservation: 1g
+    volumes:
+      - lto-data:/lto
+    environment:
+      - LTO_NETWORK=${LTO_NETWORK:-MAINNET}
+      - ENABLE_REST_API=true
+    networks:
+      - lto
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f -L -o /dev/null http://localhost:6869/node/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  indexer:
+    container_name: indexer
+    image: ltonetwork/indexer:${INDEXER_VERSION:-latest}
+    volumes:
+      - lto-index:/usr/data/lto-index
+    environment:
+      - NODE_ENV=production
+      - NODE_URL=http://public-node:6869
+      - API_PREFIX=api
+    depends_on:
+      public-node:
+        condition: service_healthy
+    networks:
+      - lto
+
+volumes:
+  lto-data:
+  lto-index:
+
+networks:
+  lto:
+    driver: bridge

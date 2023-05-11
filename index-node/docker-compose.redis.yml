@@ -1,0 +1,59 @@
+version: "2.4"
+
+services:
+  nginx:
+    container_name: nginx
+    image: ltonetwork/public-node-proxy
+    ports:
+      - ${PORT:80}:80
+    depends_on:
+      - indexer
+      - public-node
+    networks:
+      - lto
+
+  redis:
+    container_name: redis
+    image: redislabs/redisgraph
+    volumes:
+      - lto-redis:/lto
+    networks:
+      - lto
+
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node
+    volumes:
+      - lto-data:/lto
+    environment:
+      - LTO_NETWORK=${LTO_NETWORK:MAINNET}
+      - ENABLE_REST_API=true
+    networks:
+      - lto
+
+  indexer:
+    container_name: indexer
+    image: ltonetwork/indexer
+    volumes:
+      - lto-index:/usr/data/lto-index
+    environment:
+      - NODE_ENV=production
+      - NODE_URL=http://public-node:6869
+      - API_PREFIX=api
+      - STORAGE_TYPE=redis
+      - REDIS_URL=redis://redis
+    depends_on:
+      - public-node
+      - redis
+      - graph
+    networks:
+      - lto
+
+volumes:
+  lto-data:
+  lto-redis:
+  lto-index:
+
+networks:
+  lto:
+    driver: bridge
