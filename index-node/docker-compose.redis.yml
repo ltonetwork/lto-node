@@ -5,7 +5,7 @@ services:
     container_name: nginx
     image: ltonetwork/public-node-proxy
     ports:
-      - 80:80
+      - ${PORT:80}:80
     depends_on:
       - indexer
       - public-node
@@ -14,17 +14,9 @@ services:
 
   redis:
     container_name: redis
-    image: redis
-    volumes:
-      - lto-redis:/lto
-    networks:
-      - lto
-
-  graph:
-    container_name: graph
     image: redislabs/redisgraph
     volumes:
-      - lto-graph:/lto
+      - lto-redis:/lto
     networks:
       - lto
 
@@ -34,7 +26,7 @@ services:
     volumes:
       - lto-data:/lto
     environment:
-      - LTO_NETWORK=TESTNET
+      - LTO_NETWORK=${LTO_NETWORK:MAINNET}
       - ENABLE_REST_API=true
     networks:
       - lto
@@ -47,15 +39,9 @@ services:
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
+      - API_PREFIX=api
       - STORAGE_TYPE=redis
       - REDIS_URL=redis://redis
-      - REDIS_GRAPH_HOST=graph
-      - REDIS_GRAPH_PORT=6379
-      - TRANSACTION_INDEXING=true
-      - ASSOCIATION_INDEXING=all
-      - IDENTITY_INDEXING=true
-      - ANCHOR_INDEXING=all
-      - STATS_INDEXING=true
     depends_on:
       - public-node
       - redis
@@ -66,7 +52,6 @@ services:
 volumes:
   lto-data:
   lto-redis:
-  lto-graph:
   lto-index:
 
 networks:
