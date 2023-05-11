@@ -1,41 +1,102 @@
 ![LTO github readme](https://user-images.githubusercontent.com/100821/196711741-96cd4ba5-932a-4e95-b420-42d4d61c21fd.png)
 
-There are 4 configuration variations of the node. Each configuration serves a different need of the node:
-
-Node Type             |Description
-----------------------|-----------
-[Public Node only]    |Contains only the public node. This configuration can be used for mining 
-[Anchor Node]         |Contains both the public node and the indexer. The indexer is configured for the anchoring of hashes
-[Identity Node]       |Contains both the public node and the indexer. The indexer is configured for DID documents and trust networks
-**Workflow Node**     |All services required to run decentralized workflows
-
-[Public Node only]: https://github.com/ltonetwork/lto-public-node
-[Anchor Node]: https://github.com/ltonetwork/lto-anchor-node
-[Identity Node]: https://github.com/ltonetwork/lto-identity-node
-
 # LTO Network Workflow Node
 
-A Full Node can be setup using different orchestration tools.
+## Requirements
 
-Orchestration Tool
+- [Docker](https://www.docker.com/)
+- [Docker compose >= v3.0](https://docs.docker.com/compose/)
 
-- [AWS Elastic Beanstalk](AWS%20Elastic%20Beanstalk)
-- [Docker compose](Docker%20compose)
-- [Kubernetes](Kubernetes) (Coming soon)
+_You can optain the latest version of `docker-compose` using pip._
 
-## TestNet
+Alternatively 
+
+## Run on a (virtual) machine
+
+### System requirements
+
+**The Minimal requirements are:**
+
+1 vCPU
+4Gb RAM
+30Gb SSD
+
+**Recommended configuration are:**
+
+2+ vCPU
+8Gb RAM
++30Gb SSD
+
+
+### Configuration
+
+The configuration can be done via the `./docker-compose.yml` file.
+
+#### Volumes
+
+By default, the volumes for the containers are each mounted under `./volumes/`. You can change this for each service to mount to a different folder on your device. Example:
+
+```yml
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node
+    mem_limit: 1g
+    volumes:
+      - /<YOUR-FOLDER-HERE>/public-node:/lto
+    environment:
+      - LTO_NETWORK=TESTNET
+    networks:
+      - lto
+```
+
+#### Required fields
+
+There are different required fields, they are mentioned per service:
+
+*Public Node*
+
+| variable name          | description                                                                                      | format                 | extra information                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------ | ---------------------- | ----------------------------------------------------------------------------- |
+| `LTO_API_KEY`          | API key  to protect restricted functions (random secret)                                         | string                 | This can be any string                                                        |
+| `LTO_NETWORK`          | Which network to attach the node to                                                              | `MAINNET`, `TESTNET`   | Default is set to `TESTNET`                                                   |
+| `LTO_WALLET_SEED`      | The seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions.  | string                 | Can also be set as `LTO_WALLET_SEED_BASE58`, which will take a `base58` value |
+
+*Indexer*
+
+| variable name          | description                                                                                      | format                 | extra information                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------ | ---------------------- | ----------------------------------------------------------------------------- |
+| `NODE_API_KEY`         | API key  to protect restricted functions (random secret)                                         | string                 | Make sure to match the same value as the *Public Node* configuration          |
+
+**Note**
+
+The indexer is already configured to track all of the available options, but you can customize to your liking. You can see the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more on how to configure the indexer.
+
+#### Connecting to External Services
+
+The node configuration comes with Redis, RabbitMQ and MongoDB included. It is adviced to run these services outside of 
+the node. The following Environment properties can be used to connect to external services:
+
+| Service                   | Variable                      | Description                                                                         |
+| ------------------------- | ------------------------------| ----------------------------------------------------------------------------------- |
+| LegalEvents / Legalflow   | `MONGODB_URL`                 | Use the MongoDB connection string                                                   |
+| Event Dispatcher          | `DISPATCHER_RABBITMQ_CLIENT`  | Use the RabbitMQ connection string                                                  |
+| Webserver                 | `PORT`                        | Run the node on a different port                                                    |
+| Indexer                   | `REDIS_URL`                   | See the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more |
+
+## Running a node
+
+### TestNet
  
-If you wish to start testing with our testnet. Please create a wallet on: [https://testnet-wallet.lto.network](https://testnet-wallet.lto.network)
+If you wish to start testing with our testnet. Please create a wallet on: [https://wallet.testnet.lto.network](https://wallet.testnet.lto.network)
  
-Request testnet tokens via our ["LTO Tech" telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
+Request testnet tokens via the [LTO Tech Lab](https://t.me/ltotech) Telegram group.
  
-To view all the transactions on the testnet you can check out our explorer on: [https://testnet-explorer.lto.network](https://testnet-explorer.lto.network)
+To view all the transactions on the testnet you can check out our explorer on: [https://explorer.testnet.lto.network](https://explorer.testnet.lto.network)
  
-## Mainnet
+### Mainnet
  
 For mainnet you will have to buy tokens. You can then use these tokens by sending them to the wallet you will link to your node.
  
 The wallet can be found here: [https://wallet.lto.network](https://wallet.lto.network)
  
 The explorer can be found here: [https://explorer.lto.network](https://explorer.lto.network)
-
