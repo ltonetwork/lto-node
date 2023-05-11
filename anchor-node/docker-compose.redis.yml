@@ -1,0 +1,50 @@
+version: "2.4"
+
+services:
+  public-node:
+    container_name: public-node
+    image: ltonetwork/public-node
+    volumes:
+      - lto-data:/lto
+    ports:
+      - 6869:6869
+    environment:
+      - LTO_NETWORK=TESTNET
+      - ENABLE_REST_API=true
+    networks:
+      - lto
+
+  redis:
+    container_name: redis
+    image: redis
+    volumes:
+      - lto-redis:/lto
+    networks:
+      - lto
+
+  indexer:
+    container_name: indexer
+    image: ltonetwork/indexer
+    volumes:
+      - lto-index:/usr/data/lto-index
+    environment:
+      - NODE_ENV=production
+      - NODE_URL=http://public-node:6869
+      - STORAGE_TYPE=redis
+      - REDIS_URL=redis://redis
+      - ANCHOR_INDEXING=trust
+    ports:
+      - 80:80
+    networks:
+      - lto
+    depends_on:
+      - public-node
+
+volumes:
+  lto-data:
+  lto-redis:
+  lto-index:
+
+networks:
+  lto:
+    driver: bridge
