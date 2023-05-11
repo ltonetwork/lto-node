@@ -3,14 +3,15 @@ version: "2.4"
 services:
   public-node:
     container_name: public-node
-    image: ltonetwork/public-node
+    image: ltonetwork/public-node:edge
     mem_reservation: 1g
     volumes:
       - ./volumes/public-node:/lto
     ports:
       - 6863:6863
       - 6868:6868
+      - 6869:6869
     environment:
       - LTO_WALLET_SEED=
-      - LTO_NETWORK=MAINNET
+      - LTO_NETWORK=TESTNET
       
