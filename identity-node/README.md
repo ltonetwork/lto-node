@@ -1,18 +1,5 @@
 ![LTO github readme](https://user-images.githubusercontent.com/100821/196711741-96cd4ba5-932a-4e95-b420-42d4d61c21fd.png)
 
-There are 4 configuration variations of the node. Each configuration serves a different need of the node:
-
-| Node Type          | Description                                                                                                   |
-| ------------------ | ------------------------------------------------------------------------------------------------------------- |
-| [Public Node only] | Contains only the public node. This configuration can be used for mining                                      |
-| [Anchor Node]      | Contains both the public node and the indexer. The indexer is configured for the anchoring of hashes          |
-| **Identity Node**  | Contains both the public node and the indexer. The indexer is configured for DID documents and trust networks |
-| [Workflow Node]    | All services required to run decentralized workflows
-
-[public node only]: https://github.com/ltonetwork/lto-public-node
-[anchor node]: https://github.com/ltonetwork/lto-anchor-node
-[Workflow Node]: https://github.com/ltonetwork/lto-workflow-node
-
 # LTO Network Identity Node
 
 ## Configuration
@@ -80,37 +67,6 @@ This way the node will be accessible via port 80.
 
 Or you can use a reverse proxy like NGINX to both the node and indexer run off the same port or publicly available. This is highly recommended.
 
-## Run in AWS Elastic Beanstalk
-
-Running the node using AWS Elastic Beanstalk (EB) will install the services on a cloud machine. This node includes a
-Redis database, however it is highly recommended to use AWS Elastic Cache. The are 2 EB configuration files included.
-
-1. Dockerrun.redis.aws.json
-2. Dockerrun.leveldb.aws.json
-
-Take the following steps to install the node on EB:
-
-1. Choose if you wish to run the node with or without redis. Rename the correct config file to Dockerrun.aws.json
-2. Zip the Dockerrun.aws.json file
-3. Create an application
-4. Inside the created application, create an environment: `webserver environment`
-5. Select following settings:
-
-- Platform: Multi-container Docker
-- Upload the zipped file
-
-6. Configure more options
-7. Instances -> Instance type: Choose an instance with atleast 2 gb of memory (E.g. t2.small)
-8. Software -> Environment properties:
-   - Name: `LTO_NETWORK`, Value: `MAINNET` or `TESTNET` - the default is `MAINNET`, but you can set it to run a node on testnet if you wish
-   - Name: `LTO_API_KEY`, Value: `Any string` - this is your API key, can be any random string you wish
-   - Name: `NODE_API_KEY`, Value: `Same as LTO_API_KEY` - this is the API key for the `indexer` service, should be the same as `LTO_API_KEY`
-   - Name: `LTO_WALLET_PASSWORD`, Value: `Your wallet password`
-   - Name: `LTO_WALLET_SEED` or `LTO_WALLET_SEED_BASE58`, Value: `Wallet Seed`
-   - Name: `PUBLIC_HOSTNAME`, Value: `The hostname where the node is reachable. (This can be EB generated address)`
-
-Now your node should be good to go!
-
 ## Documentation
 
 You can find the API documentation on the url where your node is deployed.
@@ -118,17 +74,17 @@ You can find the API documentation on the url where your node is deployed.
 ## Running a node
 
 ### TestNet
-
-If you wish to start testing with our testnet. Please create a wallet on: [https://testnet-wallet.lto.network](https://testnet-wallet.lto.network)
-
-Send your address to our [support](mailto:support@ltonetwork.io) so we will deposit some LTO for testing on the testnet. Or request your tokens via our [telegram](https://t.me/joinchat/AJWQTUDKtDlsuGHVFb40eQ) channel.
-
-To view all the transactions on the testnet you can check out our explorer on: [https://testnet-explorer.lto.network](https://testnet-explorer.lto.network)
-
+ 
+If you wish to start testing with our testnet. Please create a wallet on: [https://wallet.testnet.lto.network](https://wallet.testnet.lto.network)
+ 
+Request testnet tokens via the [LTO Tech Lab](https://t.me/ltotech) Telegram group.
+ 
+To view all the transactions on the testnet you can check out our explorer on: [https://explorer.testnet.lto.network](https://explorer.testnet.lto.network)
+ 
 ### Mainnet
-
+ 
 For mainnet you will have to buy tokens. You can then use these tokens by sending them to the wallet you will link to your node.
-
+ 
 The wallet can be found here: [https://wallet.lto.network](https://wallet.lto.network)
-
+ 
 The explorer can be found here: [https://explorer.lto.network](https://explorer.lto.network)
