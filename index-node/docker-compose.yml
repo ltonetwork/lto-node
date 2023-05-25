@@ -4,20 +4,24 @@ services:
   nginx:
     container_name: nginx
     image: ltonetwork/public-node-proxy
+    build: ./proxy
     ports:
       - ${PORT:-80}:80
     networks:
       - lto
+    depends_on:
+      - public-node
+      - indexer
 
   public-node:
     container_name: public-node
-    image: ltonetwork/public-node:${NODE_VERSION:-latest}
+    image: ltonetwork/public-node:${LTO_NODE_VERSION:-latest}
     mem_reservation: 1g
     volumes:
       - lto-data:/lto
     environment:
       - LTO_NETWORK=${LTO_NETWORK:-MAINNET}
-      - ENABLE_REST_API=true
+      - LTO_ENABLE_REST_API=true
     networks:
       - lto
     healthcheck:
@@ -28,13 +32,14 @@ services:
 
   indexer:
     container_name: indexer
-    image: ltonetwork/indexer:${INDEXER_VERSION:-latest}
+    image: ltonetwork/indexer:${LTO_INDEXER_VERSION:-latest}
     volumes:
       - lto-index:/usr/data/lto-index
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
-      - API_PREFIX=api
+      - API_PREFIX=index
+      - LEVELDB_NAME=/usr/data/lto-index
     depends_on:
       public-node:
         condition: service_healthy

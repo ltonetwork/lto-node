@@ -4,13 +4,14 @@ services:
   nginx:
     container_name: nginx
     image: ltonetwork/public-node-proxy
+    build: ./proxy
     ports:
       - ${PORT:80}:80
-    depends_on:
-      - indexer
-      - public-node
     networks:
       - lto
+    depends_on:
+      - public-node
+      - indexer
 
   redis:
     container_name: redis
@@ -22,37 +23,40 @@ services:
 
   public-node:
     container_name: public-node
-    image: ltonetwork/public-node
+    image: ltonetwork/public-node:${LTO_NODE_VERSION:-latest}
+    mem_reservation: 1g    
     volumes:
       - lto-data:/lto
     environment:
       - LTO_NETWORK=${LTO_NETWORK:MAINNET}
-      - ENABLE_REST_API=true
+      - LTO_ENABLE_REST_API=true
     networks:
       - lto
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f -L -o /dev/null http://localhost:6869/node/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   indexer:
     container_name: indexer
-    image: ltonetwork/indexer
-    volumes:
-      - lto-index:/usr/data/lto-index
+    image: ltonetwork/indexer:${LTO_INDEXER_VERSION:-latest}
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
-      - API_PREFIX=api
+      - API_PREFIX=index
       - STORAGE_TYPE=redis
       - REDIS_URL=redis://redis
     depends_on:
-      - public-node
-      - redis
-      - graph
+      public-node:
+        condition: service_healthy
+      redis:
     networks:
       - lto
 
 volumes:
   lto-data:
   lto-redis:
-  lto-index:
 
 networks:
   lto:

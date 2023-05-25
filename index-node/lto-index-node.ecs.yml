@@ -230,11 +230,10 @@ Conditions:
   LtoApiEnabledFlag: !Equals [ true , true ]
   LtoEnabledRedisFlag: !Equals [ !Ref LtoIndexDBType , 'Redis' ]
   LtoFullHistoryFlag: !Equals [ true, true ]
-  IsIndexServiceHTTPSEnabled: !Not [ !Equals [ !Ref "IndexServiceCertificateARN", "" ] ]
-  IsIndexServiceHTTPSDisabled: !Equals [ !Ref "IndexServiceCertificateARN", "" ]
+  IsHTTPSEnabled: !Not [ !Equals [ !Ref "IndexServiceCertificateARN", "" ] ]
+  IsHTTPSDisabled: !Equals [ !Ref "IndexServiceCertificateARN", "" ]
   IsVolumeSnapshotRetentionDaysEnabled: !Not [ !Equals [ !Ref "VolumeSnapshotRetentionDays", "0" ] ]
   IsVolumeSnapshotEnabled: !Not [ !Equals [ !Ref "VolumeSnapshotId", "" ] ]
-  UseHTTPS: !Not [ !Equals [ !Ref "IndexServiceCertificateARN", "" ] ]
 
 Mappings:
   TaskConfig:
@@ -294,6 +293,14 @@ Resources:
     DeletionPolicy: Retain
     Properties:
       LogGroupName: !Sub ${AWS::StackName}-Index
+      RetentionInDays: 14
+  
+  NginxLogGroup:
+    Type: AWS::Logs::LogGroup
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupName: !Sub ${AWS::StackName}-Nginx
       RetentionInDays: 14
   
   ECSCluster:
@@ -465,6 +472,8 @@ Resources:
               Value: !Ref LtoAssociationIndexing
             - Name: ANCHOR_INDEXING
               Value: !Ref LtoAnchorIndexing
+            - Name: API_PREFIX
+              Value: index
             - Name: PORT
               Value: 8080
             - Name: REDIS_URL
@@ -511,14 +520,14 @@ Resources:
           Name: lto-nginx
         
   HTTPSListerWaitHandle: 
-    Condition: IsIndexServiceHTTPSEnabled
+    Condition: IsHTTPSEnabled
     DependsOn: 
       - ECSLoadBalancerHTTPSListener
       - ECSLoadBalancerHTTPListener
     Type: "AWS::CloudFormation::WaitConditionHandle"
 
   HTTPListerWaitHandle: 
-    Condition: IsIndexServiceHTTPSDisabled
+    Condition: IsHTTPSDisabled
     DependsOn: 
       - ECSLoadBalancerListenerHTTPOnly
     Type: "AWS::CloudFormation::WaitConditionHandle"
@@ -529,14 +538,14 @@ Resources:
   WaitCondition: 
     Type: "AWS::CloudFormation::WaitCondition"
     Properties: 
-      Handle: !If [  IsIndexServiceHTTPSEnabled  , !Ref HTTPSListerWaitHandle, !Ref WaitHandle ] 
+      Handle: !If [ IsHTTPSEnabled, !Ref HTTPSListerWaitHandle, !Ref WaitHandle ] 
       Timeout: "1"
       Count: 0
 
   WaitConditionHTTPOnly: 
     Type: "AWS::CloudFormation::WaitCondition"
     Properties: 
-      Handle: !If [  IsIndexServiceHTTPSDisabled  , !Ref HTTPListerWaitHandle, !Ref WaitHandle ] 
+      Handle: !If [ IsHTTPSDisabled, !Ref HTTPListerWaitHandle, !Ref WaitHandle ] 
       Timeout: "1"
       Count: 0
 
@@ -556,7 +565,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition
       LoadBalancers:
           !If 
-            - IsIndexServiceHTTPSEnabled 
+            - IsHTTPSEnabled 
             -  
               - ContainerName: !Sub "${AWS::StackName}-Nginx"
                 ContainerPort: 80
@@ -568,7 +577,7 @@ Resources:
 
 # ECS Load Balancer for HTTPS Specific Routing START
   ECSElasticLoadBalancer:
-    Condition: IsIndexServiceHTTPSEnabled
+    Condition: IsHTTPSEnabled
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Subnets:
@@ -578,7 +587,7 @@ Resources:
         - !Ref ECSLoadBalancerSecurityGroup
       
   ECSLoadBalancerHTTPListener:
-    Condition: IsIndexServiceHTTPSEnabled
+    Condition: IsHTTPSEnabled
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
@@ -595,7 +604,7 @@ Resources:
       Protocol: HTTP
 
   ECSLoadBalancerHTTPSListener:
-    Condition: IsIndexServiceHTTPSEnabled
+    Condition: IsHTTPSEnabled
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
@@ -608,7 +617,7 @@ Resources:
         - !Ref IndexServiceCertificateARN
 
   ECSTargetGroup:
-    Condition: IsIndexServiceHTTPSEnabled
+    Condition: IsHTTPSEnabled
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       # Name: !Sub "${AWS::StackName}"
@@ -624,7 +633,7 @@ Resources:
 # ECS Load Balancer for HTTPS Specific Routing END 
 # ECS Load Balancer for HTTP  Specific Routing START
   ECSElasticLoadBalancerHTTPOnly:
-    Condition: IsIndexServiceHTTPSDisabled
+    Condition: IsHTTPSDisabled
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
       Subnets:
@@ -634,7 +643,7 @@ Resources:
         - !Ref ECSLoadBalancerSecurityGroup
       
   # ECSLoadBalancerHTTPListener:
-  #   Condition: IsIndexServiceHTTPSEnabled
+  #   Condition: IsHTTPSEnabled
   #   Type: AWS::ElasticLoadBalancingV2::Listener
   #   Properties:
   #     DefaultActions:
@@ -651,7 +660,7 @@ Resources:
   #     Protocol: HTTP
 
   ECSLoadBalancerListenerHTTPOnly:
-    Condition: IsIndexServiceHTTPSDisabled
+    Condition: IsHTTPSDisabled
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
@@ -664,7 +673,7 @@ Resources:
       #   - !Ref IndexServiceCertificateARN
 
   ECSTargetGroupHTTPOnly:
-    Condition: IsIndexServiceHTTPSDisabled
+    Condition: IsHTTPSDisabled
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       # Name: !Sub "${AWS::StackName}-HTTP"
@@ -803,7 +812,7 @@ Resources:
                           proxy_next_upstream error timeout http_502;
                       }
                       location /index/ {
-                          proxy_pass         http://indexer/;
+                          proxy_pass         http://indexer;
                           proxy_redirect     off;
                           proxy_set_header   Host \$host;
                           proxy_set_header   X-Real-IP \$remote_addr;
@@ -1259,7 +1268,7 @@ Resources:
       ServiceToken: !GetAtt RandomStringLambdaFunction.Arn
 
   EndPointHealthCheckHTTPSDisabled: 
-    Condition: IsIndexServiceHTTPSDisabled
+    Condition: IsHTTPSDisabled
     Type: 'AWS::Route53::HealthCheck'
     Properties: 
       HealthCheckConfig: 
@@ -1275,7 +1284,7 @@ Resources:
           Value: !Sub ${AWS::StackName}-monitoring
 
   EndPointHealthCheckHTTPSEnabled: 
-    Condition: IsIndexServiceHTTPSEnabled
+    Condition: IsHTTPSEnabled
     Type: 'AWS::Route53::HealthCheck'
     Properties: 
       HealthCheckConfig: 
@@ -1371,12 +1380,12 @@ Resources:
 
 Outputs:
   NodeAPI:
-      Condition: IsIndexServiceHTTPSEnabled
-      Value: !If [ UseHTTPS, !Sub "https://${ECSElasticLoadBalancer.DNSName}", !Sub "http://${ECSElasticLoadBalancer.DNSName}" ]
+      Condition: IsHTTPSEnabled
+      Value: !If [ IsHTTPSEnabled, !Sub "https://${ECSElasticLoadBalancer.DNSName}", !Sub "http://${ECSElasticLoadBalancer.DNSName}" ]
       Description: "Public Node Load Balancer URI"
   IndexAPI:
-      Condition: IsIndexServiceHTTPSEnabled
-      Value: !If [ UseHTTPS, !Sub "https://${ECSElasticLoadBalancer.DNSName}/index", !Sub "http://${ECSElasticLoadBalancer.DNSName}/index" ]
+      Condition: IsHTTPSEnabled
+      Value: !If [ IsHTTPSEnabled, !Sub "https://${ECSElasticLoadBalancer.DNSName}/index", !Sub "http://${ECSElasticLoadBalancer.DNSName}/index" ]
       Description: "Indexer Load Balancer URI"
   RandomAPIKey:
       Value: !GetAtt RandomAPIKey.RandomString
