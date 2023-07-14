@@ -11,7 +11,7 @@ You can configure environment variables for docker compose.
 | variable name     | description                                                                                     | format               | extra information                                                             |
 | ----------------- | ----------------------------------------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------------------- |
 | `LTO_API_KEY`     | API key to protect restricted functions (random secret)                                         | string               | This can be any string                                                        |
-| `LTO_NETWORK`     | Which network to attach the node to                                                             | `MAINNET`, `TESTNET` | Default is set to `TESTNET`                                                   |
+| `LTO_NETWORK`     | Which network to attach the node to                                                             | `MAINNET`, `TESTNET` | Default is set to `MAINNET`                                                   |
 | `LTO_WALLET_SEED` | The seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions. | string               | Can also be set as `LTO_WALLET_SEED_BASE58`, which will take a `base58` value |
 | `LTO_NODE_NAME`        | Node name used in the handshake when connecting to other nodes                                  | string                 |
 
