@@ -1299,7 +1299,6 @@ Resources:
           Key: Name
           Value: !Sub ${AWS::StackName}-monitoring
 
-
   LifeCyclePolicyManagementRole:
     Type: AWS::IAM::Role
     Properties:
@@ -1359,12 +1358,12 @@ Resources:
           - VOLUME
         TargetTags:
           - Key: Name
-            Value: lto-data
+            Value: !Sub "${AWS::StackName}-data"
         Schedules:
           - Name: Daily Snapshots
             TagsToAdd:
               - Key: Name
-                Value: lto-data
+                Value: !Sub "${AWS::StackName}-data"
             CreateRule:
               Interval: 24
               IntervalUnit: HOURS
@@ -1376,7 +1375,6 @@ Resources:
       Tags:
         - Key: Name
           Value: !Sub "${AWS::StackName}-Lifecycle-Policy"
-
 
 Outputs:
   NodeAPI:

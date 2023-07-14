@@ -990,6 +990,82 @@ Resources:
       Length: 16
       ServiceToken: !GetAtt RandomStringLambdaFunction.Arn
 
+  LifeCyclePolicyManagementRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub ${AWS::StackName}-Lifecycle-Management-Role
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [dlm.amazonaws.com]
+          Action: [sts:AssumeRole]
+      Path: /
+      Policies:
+      - PolicyName: dlm-default-permission
+        PolicyDocument:
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:CreateSnapshot
+                - ec2:CreateSnapshots
+                - ec2:DeleteSnapshot
+                - ec2:DescribeInstances
+                - ec2:DescribeVolumes
+                - ec2:DescribeSnapshots
+                - ec2:EnableFastSnapshotRestores
+                - ec2:DescribeFastSnapshotRestores
+                - ec2:DisableFastSnapshotRestores
+                - ec2:CopySnapshot
+                - ec2:ModifySnapshotAttribute
+                - ec2:DescribeSnapshotAttribute
+              Resource: "*"
+            - Effect: Allow
+              Action:
+                - ec2:CreateTags
+              Resource: arn:aws:ec2:*::snapshot/*
+            - Effect: Allow
+              Action:
+                - ec2:CreateTags
+                - events:PutRule
+                - events:DeleteRule
+                - events:DescribeRule
+                - events:EnableRule
+                - events:DisableRule
+                - events:ListTargetsByRule
+                - events:PutTargets
+                - events:RemoveTargets
+              Resource: arn:aws:events:*:*:rule/AwsDataLifecycleRule.managed-cwe.*
+
+  EBSDiskLifecyclePolicy:
+    Type: AWS::DLM::LifecyclePolicy
+    Condition: IsVolumeSnapshotRetentionDaysEnabled
+    Properties:
+      Description: Lifecycle Policy using CloudFormation
+      State: ENABLED
+      ExecutionRoleArn: !GetAtt LifeCyclePolicyManagementRole.Arn
+      PolicyDetails:
+        ResourceTypes:
+          - VOLUME
+        TargetTags:
+          - Key: Name
+            Value: !Sub "${AWS::StackName}-data"
+        Schedules:
+          - Name: Daily Snapshots
+            TagsToAdd:
+              - Key: Name
+                Value: !Sub "${AWS::StackName}-data"
+            CreateRule:
+              Interval: 24
+              IntervalUnit: HOURS
+              Times:
+                - '03:00'
+            RetainRule:
+              Count: !Ref VolumeSnapshotRetentionDays
+            CopyTags: true
+      Tags:
+        - Key: Name
+          Value: !Sub "${AWS::StackName}-Lifecycle-Policy"
 
 Outputs:
   AnchorAPI:
