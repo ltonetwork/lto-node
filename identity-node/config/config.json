@@ -1,0 +1,8 @@
+{
+  "trust_network": {
+    "root": {
+      "description": "LTO account of our identity node"
+    }
+  }
+}
+

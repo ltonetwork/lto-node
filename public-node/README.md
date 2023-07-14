@@ -4,11 +4,11 @@
 
 ## Configuration
 
-The configuration can be done via the `./docker-compose.yml` file.
+The configuration can be done via environment variables or modifying the `docker-compose.yml` file.
 
 ### Volumes
 
-By default, the volumes for the containers are each mounted under `./volumes/`. You can change this for each service to mount to a different folder on your device. Example:
+By default, a named docker volume is used for persistent data. You can change thisto mount to a folder on your device. Example:
 
 ```yml
   public-node:
@@ -21,37 +21,22 @@ By default, the volumes for the containers are each mounted under `./volumes/`. 
       - LTO_NETWORK=TESTNET
 ```
 
-### Required fields
-
-There are different required fields, they are mentioned per service:
-
-*Public Node*
+### Environment variables
 
 | variable name          | description                                                                                     | format                 | extra information                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
-| `LTO_API_KEY`          | API key to protect restricted functions (random secret)                                         | string                 | This can be any string                                                        |
-| `LTO_NETWORK`          | Which network to attach the node to                                                             | `MAINNET`, `TESTNET`   | Default is set to `TESTNET`                                                   |
+| `LTO_NETWORK`          | Which network to attach the node to                                                             | `MAINNET`, `TESTNET`   | Default is set to `MAINNET`                                                   |
 | `LTO_WALLET_SEED`      | The seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions. | string                 | Can also be set as `LTO_WALLET_SEED_BASE58`, which will take a `base58` value |
+
+### Docker images
+
+By default, the `latest` tag is used for all docker images. You can use an alternative tag for the LTO public node by setting `LTO_NODE_VERSION`.
 
 ## Run on a (virtual) machine
 
 ```
 docker-compose up
 ```
-    
-Docker compose is configured to run the node on a local machine on port 80. If you would like to run the node on different
-port you will need to change the `docker-compose.yml` to
-
-```
-ports:
-    - <your-port>:80
-```
-
-This way the node will be accessible via port 80.
-
-## Documentation
-
-You can find the API documentation on the url where your node is deployed.
 
 ## Running a node
 

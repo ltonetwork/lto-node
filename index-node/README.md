@@ -10,22 +10,33 @@ It is recommended to have at least 2gb of RAM to run this configuration, as the 
 
 ## Configuration
 
-Under the `docker-compose.yml` files, you can configure environment variables for the containers. If you want the `indexer` to run with all the functionalities, be sure to provide the following variables:
+You can configure environment variables for docker compose. The `indexer` is configured with the following variables:
 
 | variable name          | description                          | format                 | devault value | extra information                                         |
 | ---------------------- | ------------------------------------ | ---------------------- | ------------- | --------------------------------------------------------- |
-| `LTO_NETWORK`          | Mainnet or testnet                   | `MAINNET`, `TESTNET`   | `TESTNET`     |                                                           | 
+| `LTO_NETWORK`          | Mainnet or testnet                   | `MAINNET`, `TESTNET`   | `MAINNET`     |                                                           | 
 | `ASSOCIATION_INDEXING` | Indexing of association transactions | `none`, `trust`, `all` | `"all"`       |                                                           |
-| `IDENTITY_INDEXING`    | Indexing of identities               | boolean                | `true `       | Tracks verification methods and public keys for addresses |
-| `TRANSACTION_INDEXING` | Indexing of transactions             | boolean                | `true `       |                                                           |
-| `ANCHOR_INDEXING`      | Indexing of anchor transactions      | `none`, `trust`, `all` | `"all" `      |                                                           |
-| `STATS_INDEXING`       | Indexing of blockchain statistics    | boolean                | `true `       | Enables `operations`, `transactions` and `supply` stats   |
+| `IDENTITY_INDEXING`    | Indexing of identities               | boolean                | `true`        | Tracks verification methods and public keys for addresses |
+| `TRANSACTION_INDEXING` | Indexing of transactions             | boolean                | `true`        |                                                           |
+| `ANCHOR_INDEXING`      | Indexing of anchor transactions      | `none`, `trust`, `all` | `"all"`       |                                                           |
+| `STATS_INDEXING`       | Indexing of blockchain statistics    | boolean                | `true`        | Enables `operations`, `transactions` and `supply` stats   |
 
-You can see a list of all of the available variables on the [indexer](https://github.com/ltonetwork/indexer) repository.
+You can see a list of all of the available variables on the [indexer](https://github.com/ltonetwork/indexer) and the [public chain](https://github.com/ltonetwork/lto-public-chain) repositories.
 
-## Docker images
+### Docker images
 
 By default, the `latest` tag is used for all docker images. You can use an alternative tag for the LTO public node by setting `LTO_NODE_VERSION` and `LTO_INDEXER_VERSION` for the LTO indexer.
+
+## Redis
+
+Data is stored on-disk using LevelDB. You can store the data using Redis. Use the `redis` profile to start a Redis Graph instance and set the storage type variable:
+
+```
+export STORAGE_TYPE=redis
+docker compose --profile redis up
+```
+
+Alternatively, you can run a Redis instance outside of the docker compose cluster and connect to that with the `REDIS_URL` environment variable. Redis Graph is needed to index associations as a graph.
 
 ## Cloudformation
 

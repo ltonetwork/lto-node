@@ -39,16 +39,35 @@ services:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
       - API_PREFIX=index
+      - STORAGE_TYPE=${STORAGE_TYPE:-leveldb}
       - LEVELDB_NAME=/usr/data/lto-index
+      - REDIS_URL=${REDIS_URL:-redis://redis}
+      - TRANSACTION_INDEXING=${TRANSACTION_INDEXING:-true}
+      - IDENTITY_INDEXING=${IDENTITY_INDEXING:-true}
+      - ASSOCIATION_INDEXING=${ASSOCIATION_INDEXING:-all}
+      - ANCHOR_INDEXING=${ANCHOR_INDEXING:-all}
+      - STATS_INDEXING=${STATS_INDEXING:-true}
+      
     depends_on:
       public-node:
         condition: service_healthy
     networks:
       - lto
 
+  redis:
+    container_name: redis
+    image: redislabs/redisgraph
+    volumes:
+      - lto-redis:/data
+    networks:
+      - lto
+    profiles:
+      - redis
+
 volumes:
   lto-data:
   lto-index:
+  lto-redis:
 
 networks:
   lto:

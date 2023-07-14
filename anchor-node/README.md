@@ -2,15 +2,11 @@
 
 # LTO Network Anchor Node
 
-### Configuration
+## Configuration
 
-The configuration can be done via the `./docker-compose.yml` file.
+You can configure environment variables for docker compose.
 
-#### Required fields
-
-There are different required fields, they are mentioned per service:
-
-*Public Node*
+#### Public Node
 
 | variable name          | description                                                                                     | format                 | extra information                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
@@ -19,14 +15,14 @@ There are different required fields, they are mentioned per service:
 | `LTO_WALLET_SEED`      | The seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions. | string                 | Can also be set as `LTO_WALLET_SEED_BASE58`, which will take a `base58` value |
 | `LTO_NODE_NAME`        | Node name used in the handshake when connecting to other nodes                                  | string                 |
 
-*Indexer*
+#### Indexer
 
 | variable name          | description                                                                                     | format                 | extra information                                                             |
 | ---------------------- | ----------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------------- |
-| `ASSOCIATION_INDEXING`   | Indexing of association transactions                     | `none`, `trust`, `all`                  |         |
-| `ANCHOR_INDEXING`        | Indexing of anchor transactions                          | `none`, `trust`, `all`                  |         |
+| `ANCHOR_INDEXING`        | Indexing of anchor transactions                          | `none`, `trust`, `all`                  | Defaults to 'trust' |
+| `ASSOCIATION_INDEXING`   | Indexing of association transactions                     | `none`, `trust`, `all`                  | Defaults to 'none'  |
 | `AUTH_TOKEN`             | Authentication token                                     | string                                  |         |
-| `NODE_API_KEY`           | Node API key	                                          | string                                  | Same value as `LTO_API_KEY` of the public node |                                                                                            |
+| `NODE_API_KEY`           | Node API key	                                          | string                                  | Same value as `LTO_API_KEY` of the public node |
 
 The indexing configurations have the values of `none`, `trust` or `all`.
 
@@ -40,13 +36,20 @@ By default, the anchor node will only index anchor transactions of your own node
 
 The indexer is configured to run as an anchoring service, but you can customize to your liking. You can see the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more on how to configure the indexer.
 
-#### Connecting to External Services
+### Docker images
 
-The following environment properties can be used to connect to external services:
+By default, the `latest` tag is used for all docker images. You can use an alternative tag for the LTO public node by setting `LTO_NODE_VERSION` and `LTO_INDEXER_VERSION` for the LTO indexer.
 
-| Service                   | Variable                      | Description                                                                         |
-| ------------------------- | ------------------------------| ----------------------------------------------------------------------------------- |
-| Indexer                   | `REDIS_URL`                   | See the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more |
+## Redis
+
+Data is stored on-disk using LevelDB. You can store the data using Redis. Use the `redis` profile to start a Redis Graph instance and set the storage type variable:
+
+```
+export STORAGE_TYPE=redis
+docker compose --profile redis up
+```
+
+Alternatively, you can run a Redis instance outside of the docker compose cluster and connect to that with the `REDIS_URL` environment variable. Redis Graph is needed to index associations as a graph.
 
 ## Run on a (virtual) machine
 
@@ -54,21 +57,7 @@ The following environment properties can be used to connect to external services
 docker-compose up
 ```
     
-Docker compose is configured to run the node on a local machine on port 80. If you would like to run the node on different
-port you will need to change the `docker-compose.yml` to
-
-```
-ports:
-    - <your-port>:80
-```
-
-This way the node will be accessible via port 80.
-
-Or you can use a reverse proxy like NGINX to make the node publicly available. This is highly recommended. 
-
-## Documentation
-
-You can find the API documentation on the url where your node is deployed.
+Docker compose is configured to run the node on a local machine on port 80. You can set the `PORT` environment` variable to use a different port.
 
 ## Running a node
 

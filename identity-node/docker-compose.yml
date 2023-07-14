@@ -3,40 +3,49 @@ version: "2.4"
 services:
   public-node:
     container_name: public-node
-    image: ltonetwork/public-node
+    image: ltonetwork/public-node:${LTO_NODE_VERSION:-latest}
     volumes:
       - lto-data:/lto
-    ports:
-      - 6869:6869
     environment:
-      - LTO_NETWORK=TESTNET
+      - LTO_NETWORK=${LTO_NETWORK:-MAINNET}
       - ENABLE_REST_API=true
     networks:
       - lto
 
   indexer:
     container_name: indexer
-    image: ltonetwork/indexer
+    image: ltonetwork/indexer:${LTO_INDEXER_VERSION:-latest}
     volumes:
       - lto-index:/usr/data/lto-index
+      - ./config:/etc/lto-index/      
     environment:
       - NODE_ENV=production
       - NODE_URL=http://public-node:6869
-      - TRANSACTION_INDEXING=true
-      - ASSOCIATION_INDEXING=all
-      - IDENTITY_INDEXING=true
-      - TRUST_NETWORK_INDEXING=true
-      - 'TRUST_NETWORK_ROLES={"root": {"description": "The root role","issues": [{ "type": 100, "role": "university" }]},"university": {"description": "University"}}'
+      - STORAGE_TYPE=${STORAGE_TYPE:-leveldb}      
+      - LEVELDB_NAME=/usr/data/lto-index
+      - REDIS_URL=${REDIS_URL:-redis://redis}      
+      - IDENTITY_INDEXING=${DID_INDEXING:-true}
     ports:
-      - 80:80
+      - ${PORT:-80}:80
     networks:
       - lto
     depends_on:
       - public-node
 
+  redis:
+    container_name: redis
+    image: redis
+    volumes:
+      - lto-redis:/data
+    networks:
+      - lto
+    profiles:
+      - redis
+
 volumes:
   lto-data:
   lto-index:
+  lto-redis:
 
 networks:
   lto:

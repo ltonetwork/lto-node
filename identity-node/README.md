@@ -4,21 +4,18 @@
 
 ## Configuration
 
-The configuration can be done via the `./docker-compose.yml` file.
+You can configure environment variables for docker compose.
 
-### Required fields
-
-There are different required fields, they are mentioned per service:
-
-_Public Node_
+#### Public Node
 
 | variable name     | description                                                                                     | format               | extra information                                                             |
 | ----------------- | ----------------------------------------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------------------- |
 | `LTO_API_KEY`     | API key to protect restricted functions (random secret)                                         | string               | This can be any string                                                        |
 | `LTO_NETWORK`     | Which network to attach the node to                                                             | `MAINNET`, `TESTNET` | Default is set to `TESTNET`                                                   |
 | `LTO_WALLET_SEED` | The seed of your wallet. Your wallet needs to have sufficient funds to anchor the transactions. | string               | Can also be set as `LTO_WALLET_SEED_BASE58`, which will take a `base58` value |
+| `LTO_NODE_NAME`        | Node name used in the handshake when connecting to other nodes                                  | string                 |
 
-_Indexer_
+#### Indexer
 
 | variable name  | description                                             | format | extra information                                                    |
 | -------------- | ------------------------------------------------------- | ------ | -------------------------------------------------------------------- |
@@ -30,46 +27,50 @@ The indexer is configured to run as an identity service, but you can customize t
 
 ### Trust Network
 
-The trust network configuration is done via the following variables:
+In addition to environment variables, you can also specifigy configuration options using the config file. This is especially useful when configuring a trust network.
 
-| variable name            | description                                                                | format  | extra information                                                                                                                                             |
-| ------------------------ | -------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `TRUST_NETWORK_INDEXING` | Flag that allows the service to index trust network roles and transactions | boolean | Needs to be set to `true` if you want to run a trust network                                                                                                  |
-| `TRUST_NETWORK_ROLES`    | The roles for the trust network, in a JSON format                          | object  | As this variable is an object, it needs to be encased in single quotes `'` to work. For the `Dockerrun` files, you need to escape the double quotes with `\"` |
+By default, only the network root, which is your node address, is registered. Add additional roles and specify how those roles are granted.
 
-By default, this node comes with an example for trust network configuration, which you can find on the file `trust-network-example.json`. You can modify this file to your liking, but don't forget to copy the contents into the `TRUST_NETWORK_ROLES` in the `docker-compose` file.
+```json
+{
+  "trust_network": {
+    "root": {
+      "description": "LTO account of our identity node"
+      "issues": [
+         { "type": 1, "role": "trusted" }
+      ]
+    },
+    "trusted": {
+       "description": "Trusted party"
+    }
+  }
+}
+```
 
 You can read more about the trust network [here](https://docs.ltonetwork.com/v/edge/node/identity-node/configuration-1/configuration).
 
-### Connecting to External Services
+### Docker images
 
-The docker configuration comes with Redis included. It is adviced to run these services outside of the node. The following Environment properties can be used to connect to external services:
+By default, the `latest` tag is used for all docker images. You can use an alternative tag for the LTO public node by setting `LTO_NODE_VERSION` and `LTO_INDEXER_VERSION` for the LTO indexer.
 
-| Service                 | Variable                     | Description                                                                         |
-| ----------------------- | ---------------------------- | ----------------------------------------------------------------------------------- |
-| Indexer                 | `REDIS_URL`                  | See the [GitHub page](https://github.com/ltonetwork/indexer#configuration) for more |
+## Redis
+
+Data is stored on-disk using LevelDB. You can store the data using Redis. Use the `redis` profile to start a Redis Graph instance and set the storage type variable:
+
+```
+export STORAGE_TYPE=redis
+docker compose --profile redis up
+```
+
+Alternatively, you can run a Redis instance outside of the docker compose cluster and connect to that with the `REDIS_URL` environment variable. Redis Graph is needed to index associations as a graph.
 
 ## Run on a (virtual) machine
 
 ```
 docker-compose up
 ```
-
-Docker compose is configured to run the indexer on a local machine on port 80. If you would like to run it on different
-port you will need to change the `docker-compose.yml` to
-
-```
-ports:
-    - <your-port>:80
-```
-
-This way the node will be accessible via port 80.
-
-Or you can use a reverse proxy like NGINX to both the node and indexer run off the same port or publicly available. This is highly recommended.
-
-## Documentation
-
-You can find the API documentation on the url where your node is deployed.
+    
+Docker compose is configured to run the node on a local machine on port 80. You can set the `PORT` environment` variable to use a different port.
 
 ## Running a node
 
