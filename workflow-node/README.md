@@ -85,7 +85,7 @@ the node. The following Environment properties can be used to connect to externa
 
 ## Running a node
 
-### TestNet
+### Testnet
  
 If you wish to start testing with our testnet. Please create a wallet on: [https://wallet.testnet.lto.network](https://wallet.testnet.lto.network)
  
