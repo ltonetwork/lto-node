@@ -1,4 +1,4 @@
-version: "2.4"
+version: "3.2"
 
 services:
   public-node:
@@ -11,6 +11,8 @@ services:
       - ENABLE_REST_API=true
     networks:
       - lto
+    ports:
+      - ${PUBLIC_NODE_PORT:-}:6869
     healthcheck:
       test: ["CMD-SHELL", "curl -s -f -L -o /dev/null http://localhost:6869/node/status"]
       interval: 30s
