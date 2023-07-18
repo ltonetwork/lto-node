@@ -11,6 +11,11 @@ services:
       - ENABLE_REST_API=true
     networks:
       - lto
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -f -L -o /dev/null http://localhost:6869/node/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   indexer:
     container_name: indexer
@@ -30,7 +35,8 @@ services:
     networks:
       - lto
     depends_on:
-      - public-node
+      public-node:
+        condition: service_healthy
 
   redis:
     container_name: redis

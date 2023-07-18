@@ -72,6 +72,10 @@ docker-compose up
     
 Docker compose is configured to run the node on a local machine on port 80. You can set the `PORT` environment` variable to use a different port.
 
+## Cloudformation
+
+Use `lto-identity-node.ecs.yaml` to run the index node using AWS Cloudformation.
+
 ## Running a node
 
 ### TestNet

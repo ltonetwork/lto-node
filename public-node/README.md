@@ -38,6 +38,10 @@ By default, the `latest` tag is used for all docker images. You can use an alter
 docker-compose up
 ```
 
+## Cloudformation
+
+Use `lto-public-node.ecs.yaml` to run the index node using AWS Cloudformation.
+
 ## Running a node
 
 ### TestNet
