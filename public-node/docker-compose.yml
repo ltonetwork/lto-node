@@ -10,7 +10,7 @@ services:
     ports:
       - 6863:6863
       - 6868:6868
-      - 6869:6869
+      - "${REST_API_PORT:-}":6869
     environment:
       - LTO_WALLET_SEED=${LTO_WALLET_SEED}
       - LTO_WALLET_SEED_BASE58=${LTO_WALLET_SEED_BASE58}
@@ -18,4 +18,3 @@ services:
 
 volumes:
   lto-data:
-
