@@ -1,0 +1,24 @@
+{
+  "AWSEBDockerrunVersion": "1",
+  "Image": {
+    "Name": "ltonetwork/relay:nightly",
+    "Update": "true"
+  },
+  "Ports": [
+    {
+      "ContainerPort": "3000",
+      "HostPort": "3000"
+    }
+  ],
+  "Environment": [
+    {
+      "Name": "ACCEPT_ALL",
+      "Value": "true"
+    },
+    {
+      "Name": "VERIFY_ANCHOR",
+      "Value": "true"
+    }
+  ],
+  "Logging": "/var/log/nginx"
+}

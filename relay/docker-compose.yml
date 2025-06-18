@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  relay:
+    image: ltonetwork/relay:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - ACCEPT_ALL=true
+      - VERIFY_ANCHOR=true
+    env_file:
+      - .env
+
