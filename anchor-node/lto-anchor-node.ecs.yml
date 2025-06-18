@@ -29,15 +29,20 @@ Metadata:
           - ApplicationState
           - HighCapacityInstanceSize
           - LowCapacityInstanceSize
+          - EC2KeyPair
+          - PublicIP
           - ECSAMI
-          - VolumeSnapshotRetentionDays
-          - VolumeSnapshotId
       - Label:
           default: Network
         Parameters:
           - ApplicationVPC
           - ApplicationSubnet
           - ApplicationAZ
+      - Label:
+          default: Volume
+        Parameters:
+          - VolumeSnapshotRetentionDays
+          - VolumeSnapshotId
       - Label: 
           default: Database
         Parameters:
@@ -89,6 +94,10 @@ Metadata:
           default: Number Of Days Volume Snapshot Retained
         VolumeSnapshotId:
           default: Volume Snapshot ID ( Not ARN )
+        EC2KeyPair:
+          default: EC2 KeyPair name
+        PublicIP:
+          default: Public IP address
 
 
 Parameters:
@@ -190,14 +199,25 @@ Parameters:
     Type: String
     Description: Indexer version number (eg v1.3)  or tag (latest, edge or nightly)
     Default: latest
-
+  EC2KeyPair:
+    Type: String
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+    Default: ""
+  PublicIP:
+    Type: String
+    Description: Assign a public IP address to the EC2 instance
+    AllowedValues: [ true, false ]
+    ConstraintDescription: Please choose a true or false
+    Default: false
+    
 Conditions:
   AllowHighCapacityInstanceSize: !Equals [ !Ref ApplicationState, high ]
   LtoApiEnabledFlag: !Equals [ !Ref LtoEnableRestApi , true ]
   LtoEnabledRedisFlag: !Equals [ !Ref LtoIndexDBType , Redis ]
   IsVolumeSnapshotRetentionDaysEnabled: !Not [ !Equals [!Ref "VolumeSnapshotRetentionDays", "0"] ]
   IsVolumeSnapshotEnabled: !Not [ !Equals [!Ref "VolumeSnapshotId", ""] ]
-
+  IsEC2KeyPairSpecified: !Not [ !Equals [!Ref EC2KeyPair, ""] ]
+  PublicIPFlag: !Equals [ !Ref PublicIP , true ]
 
 Mappings:
   TaskConfig:
@@ -316,7 +336,7 @@ Resources:
       IpProtocol: tcp
       FromPort: 80
       ToPort: 80
-      CidrIp: 0.0.0.0/0
+      CidrIp: 10.0.0.0/8
 
   ElastiCacheRedisCluster:
     Condition: LtoEnabledRedisFlag
@@ -348,6 +368,12 @@ Resources:
           Memory: !If [ AllowHighCapacityInstanceSize , !FindInMap [ TaskConfig, !Ref HighCapacityInstanceSize, memory ] , !FindInMap [ TaskConfig, !Ref LowCapacityInstanceSize, memory ]]
           Essential: true
           PortMappings:
+            - ContainerPort: 6868
+              HostPort: 6868
+              Protocol: tcp
+            - ContainerPort: 6863
+              HostPort: 6863
+              Protocol: tcp
             - ContainerPort: 6869
               HostPort: 6869
               Protocol: tcp
@@ -500,6 +526,8 @@ Resources:
       SecurityGroups: [!Ref EcsHostSecurityGroup]
       InstanceType:  !If [ AllowHighCapacityInstanceSize, !Ref HighCapacityInstanceSize , !Ref LowCapacityInstanceSize]
       IamInstanceProfile: !Ref EC2InstanceProfile
+      KeyName: !If [IsEC2KeyPairSpecified, !Ref EC2KeyPair, !Ref AWS::NoValue]
+      AssociatePublicIpAddress: !If [PublicIPFlag, true, false]
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash -xe
@@ -870,6 +898,14 @@ Resources:
                       },
                       {
                           'ParameterKey': 'VolumeSnapshotRetentionDays',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'EC2KeyPair',
+                          'UsePreviousValue': True
+                      },
+                      {
+                          'ParameterKey': 'PublicIP',
                           'UsePreviousValue': True
                       }
                   ],
